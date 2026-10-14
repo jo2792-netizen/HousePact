@@ -7,13 +7,20 @@ import { Icon, type IconName } from "@/components/icons";
 import { Logo, NavBar } from "@/components/ui";
 import { reset, useHouse } from "@/lib/store";
 
-const TABS: [string, string, IconName][] = [
+// Everything, in the sidebar on larger screens
+const SECTIONS: [string, string, IconName][] = [
   ["/", "Home", "home"],
   ["/pact", "Agreement", "agreement"],
   ["/chores", "Chores", "chores"],
   ["/bills", "Bills", "bills"],
   ["/calendar", "Calendar", "calendar"],
+  ["/condition", "Condition", "camera"],
+  ["/repairs", "Repairs", "wrench"],
+  ["/info", "Apartment Info", "info"],
 ];
+// Phones get five tabs (the HIG limit); the rest sit under More
+const TABS: [string, string, IconName][] = [...SECTIONS.slice(0, 4), ["/more", "More", "more"]];
+const UNDER_MORE = ["/more", "/calendar", "/condition", "/repairs", "/info"];
 
 // Wraps every screen except Setup: sends first-time visitors to Setup. Phones get a top
 // navigation bar and a bottom tab bar; larger screens get a sidebar.
@@ -26,7 +33,8 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
     if (house === null) router.replace("/setup");
   }, [house, router]);
 
-  const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  const isActive = (href: string) =>
+    href === "/" ? path === "/" : href === "/more" ? UNDER_MORE.some((p) => path.startsWith(p)) : path.startsWith(href);
 
   return (
     <>
@@ -47,7 +55,7 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
           </div>
         )}
         <nav aria-label="Main" className="flex flex-col gap-1">
-          {[...TABS, ["/info", "Apartment Info", "info"] as [string, string, IconName]].map(([href, label, icon]) => (
+          {SECTIONS.map(([href, label, icon]) => (
             <Link
               key={href}
               href={href}

@@ -3,8 +3,31 @@ import { useSyncExternalStore } from "react";
 import type { Answers, Household } from "./agreement";
 
 export type Chore = { name: string; who: number; often: "Daily" | "Weekly"; doneBy?: number; doneAt?: string };
-export type Bill = { amount: number; paidBy: number; category: string; at: string; note?: string; paidTo?: number }; // paidTo: a payment between roommates
+export type Bill = {
+  amount: number;
+  paidBy: number;
+  category: string;
+  at: string;
+  note?: string;
+  paidTo?: number; // set for a payment between roommates
+  splitWith?: number[]; // who shares the cost; everyone if not set (one person = an individual charge)
+  repairId?: string; // the repair this cost came from
+};
 export type CalEvent = { kind: string; start: string; end: string; by: number; note?: string };
+export type Note = { text: string; at: string; room?: string; photos?: string[] }; // a condition note, with photos as image data URLs
+export type RepairStatus = "Reported" | "Scheduled" | "In Progress" | "Fixed";
+export type Repair = {
+  id: string;
+  title: string;
+  room: string;
+  status: RepairStatus;
+  fixer: "Landlord" | "Roommates"; // the landlord's repairs cost the house nothing
+  reportedBy: number;
+  at: string;
+  note?: string;
+  // Group costs are split equally; an individual cost is charged to one roommate. Either way it's added to Bills.
+  cost?: { amount: number; split: "Group" | "Individual"; responsible: number; paidBy: number };
+};
 
 export type House = {
   name: string;
@@ -12,13 +35,14 @@ export type House = {
   me: number; // which roommate is using the app
   since: string; // setup date, starts the monthly Housepact bill
   info: Record<string, string>; // WiFi, trash days, contacts, emergency info
-  notes: { text: string; at: string }[]; // condition tracker
+  notes: Note[]; // condition notes and before photos
   // the Roommate Agreement made during onboarding; signatures hold when each roommate signed
   agreement: { household: Household; answers: Answers; signatures: (string | null)[] };
   chores: Chore[];
   bills: Bill[];
   events: CalEvent[];
   photo?: string; // the apartment photo, as an image data URL
+  repairs?: Repair[];
   rentPaid?: Record<string, number[]>; // roommates who paid their rent share, by month ("2026-11")
 };
 

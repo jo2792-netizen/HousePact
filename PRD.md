@@ -24,7 +24,9 @@ College students and young professionals sharing an apartment with 2–6 roommat
 
 **Apartment Info.** WiFi (tap to copy), trash pickup days, super/HOA contacts, and emergency info (contacts, shutoff valve, breaker box).
 
-**Condition Tracker.** A short list of notes on the apartment's condition (e.g. "Scratch on kitchen counter, move-in").
+**Condition.** A tab for the apartment's condition: a "Before Photos" gallery from move-in (tied to the agreement's move-in photo clause) and notes grouped by room, each with photos. Add notes and photos, view photos full size, and report a repair from any note.
+
+**Repairs.** A tab for anything that needs fixing: what it is, the room, status (Reported, Scheduled, In Progress, Fixed), and who fixes it (landlord or roommates). A roommate repair's cost is either split by the group or charged to one roommate (for damage they caused), and it's added to Bills automatically, updating who owes whom.
 
 **Agreement.** Seven question screens (cleanliness; chores; rent, utilities, and groceries; food and belongings; quiet hours; damage; sublets, move-out, and disagreements) using sliders, option cards, toggles, and dropdowns, each with a recommended default. A template function turns the answers into a formal Residential Roommate Agreement: ten numbered articles, a rent split table, a chore rotation schedule, standard provisions, and type-to-sign signatures that mark it "Fully Executed." It can be downloaded as a PDF and is viewable later from the Pact tab. Dishes, personal items in shared spaces, guests, and damage reporting aren't asked; the agreement uses the recommended defaults for those.
 

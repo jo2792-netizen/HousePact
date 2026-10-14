@@ -6,7 +6,7 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { ApartmentArt } from "@/components/apartment-art";
 import { BillRow, Card, ChoreRow, EventRow, RentCard, SeeAll, Stat } from "@/components/cards";
 import { Icon, type IconName } from "@/components/icons";
-import { AddBill, AddChore, AddEvent } from "@/components/sheets";
+import { AddBill, AddChore, AddEvent, ReportRepair } from "@/components/sheets";
 import { Dot } from "@/components/ui";
 import { DISHES, GUEST_NOTICE, PARTIES, clock, label, longDate } from "@/lib/agreement";
 import { allBills, debts, greeting, headsUp, isDone, money, rentStatus, time, upcoming, when } from "@/lib/house";
@@ -16,7 +16,7 @@ export default function Home() {
   const h = useHouse();
   const [copied, setCopied] = useState(false);
   const [resent, setResent] = useState<number | null>(null); // which roommate's invite was just resent
-  const [adding, setAdding] = useState<"Bill" | "Chore" | "Event" | null>(null);
+  const [adding, setAdding] = useState<"Bill" | "Chore" | "Event" | "Repair" | null>(null);
   const photoInput = useRef<HTMLInputElement>(null);
   if (!h) return null;
 
@@ -29,6 +29,7 @@ export default function Home() {
   const unsigned = h.mates.filter((_, i) => !signatures[i]);
   const events = upcoming(h.events);
   const quiet = headsUp(h.events);
+  const openRepairs = (h.repairs ?? []).filter((r) => r.status !== "Fixed");
 
   // Open chores, yours first
   const openChores = h.chores
@@ -123,6 +124,10 @@ export default function Home() {
                 Add {kind}
               </button>
             ))}
+            <button onClick={() => setAdding("Repair")} className="btn-secondary w-auto px-4">
+              <Icon name="wrench" className="size-4" />
+              Report Repair
+            </button>
           </div>
         </div>
       </section>
@@ -237,6 +242,26 @@ export default function Home() {
             )}
           </Card>
 
+          <Card title="Open Repairs" icon="wrench" action={<SeeAll href="/repairs" />}>
+            {openRepairs.length ? (
+              <ul className="divide-y divide-separator">
+                {openRepairs.map((r) => (
+                  <li key={r.id} className="flex min-h-14 items-center gap-4 py-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold">{r.title}</p>
+                      <p className="text-subhead text-secondary">
+                        {r.room} · {r.fixer === "Landlord" ? "Landlord fixing" : r.cost ? `${money(r.cost.amount)} in Bills` : "Cost not added yet"}
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-md bg-fill px-2 py-1 text-subhead font-semibold text-secondary">{r.status}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-secondary">Nothing needs fixing.</p>
+            )}
+          </Card>
+
           <Card title="House Info" icon="info" action={<SeeAll href="/info" />}>
             <ul className="divide-y divide-separator">
               <li className="flex min-h-14 items-center gap-4 py-2">
@@ -285,6 +310,7 @@ export default function Home() {
       {adding === "Bill" && <AddBill h={h} onClose={() => setAdding(null)} />}
       {adding === "Chore" && <AddChore h={h} onClose={() => setAdding(null)} />}
       {adding === "Event" && <AddEvent h={h} onClose={() => setAdding(null)} />}
+      {adding === "Repair" && <ReportRepair h={h} onClose={() => setAdding(null)} />}
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { rentShares, shortName, toYMD } from "./agreement";
-import type { Bill, CalEvent, Chore, House } from "./store";
+import { SAMPLE_PHOTOS } from "./photos";
+import type { Bill, CalEvent, Chore, House, Repair } from "./store";
 
 export const COLORS = ["#4F7CFF", "#2BB673", "#F28C38", "#A66CFF", "#EC5FA0", "#20B2C4"];
 export const CATEGORIES = ["Groceries", "Utilities", "Repairs", "Furniture"];
@@ -53,8 +54,12 @@ export function debts(house: House) {
   const net = house.mates.map(() => 0); // above 0: is owed money, below 0: owes money
   for (const bill of allBills(house)) {
     net[bill.paidBy] += bill.amount;
-    if (bill.paidTo !== undefined) net[bill.paidTo] -= bill.amount; // a payment settles a debt
-    else for (let i = 0; i < net.length; i++) net[i] -= bill.amount / net.length;
+    if (bill.paidTo !== undefined) {
+      net[bill.paidTo] -= bill.amount; // a payment settles a debt
+    } else {
+      const sharers = bill.splitWith ?? house.mates.map((_, i) => i); // an individual charge has one sharer
+      for (const i of sharers) net[i] -= bill.amount / sharers.length;
+    }
   }
   // Settle the biggest debt with the biggest credit until everyone is even
   const list: { from: number; to: number; amount: number }[] = [];
@@ -73,7 +78,7 @@ export function debts(house: House) {
 export function spentThisMonth(house: House) {
   const month = toYMD(new Date()).slice(0, 7);
   return allBills(house)
-    .filter((b) => b.paidTo === undefined && toYMD(new Date(b.at)).slice(0, 7) === month)
+    .filter((b) => b.paidTo === undefined && !b.splitWith && toYMD(new Date(b.at)).slice(0, 7) === month)
     .reduce((sum, b) => sum + b.amount, 0);
 }
 
@@ -179,10 +184,28 @@ export function newHouse(agreement: House["agreement"]): House {
       water: "Under the kitchen sink",
       breaker: "Hall closet, top shelf",
     },
+    // Move-in notes with before photos, plus one noted later
     notes: [
-      { text: "Scratch on kitchen counter, move-in", at: moveIn },
-      { text: "Small stain on living room carpet", at: moveIn },
-      { text: "Bathroom fan is loud", at: at(-12) },
+      { text: "Scratch across the kitchen counter", room: "Kitchen", at: moveIn, photos: [SAMPLE_PHOTOS.kitchen] },
+      { text: "Stain on the living room carpet", room: "Living Room", at: moveIn, photos: [SAMPLE_PHOTOS.carpet] },
+      { text: "Chipped tile next to the shower", room: "Bathroom", at: moveIn, photos: [SAMPLE_PHOTOS.tile] },
+      { text: "Bathroom fan is loud", room: "Bathroom", at: at(-12) },
+    ],
+    repairs: [
+      { id: "r1", title: "Loud bathroom fan", room: "Bathroom", status: "Scheduled", fixer: "Landlord", reportedBy: m(0), at: at(-12), note: "The super is coming to replace it." },
+      { id: "r2", title: "Leaky kitchen faucet", room: "Kitchen", status: "Fixed", fixer: "Roommates", reportedBy: m(2), at: at(-11), cost: { amount: 60, split: "Group", responsible: m(2), paidBy: m(2) } },
+      { id: "r3", title: "Broken living room blinds", room: "Living Room", status: "Reported", fixer: "Roommates", reportedBy: m(1), at: at(-1) },
+      {
+        id: "r4",
+        title: "Doorknob hole in the bedroom wall",
+        room: "Bedroom",
+        status: "Fixed",
+        fixer: "Roommates",
+        reportedBy: m(0),
+        at: at(-6),
+        note: "Caused by a door slammed during a party, so one roommate covers it.",
+        cost: { amount: 45, split: "Individual", responsible: m(3), paidBy: m(0) },
+      },
     ],
     chores: [
       { name: "Wash dishes", who: m(0), often: "Daily" },
@@ -193,7 +216,8 @@ export function newHouse(agreement: House["agreement"]): House {
     ],
     bills: [
       { amount: 132, paidBy: m(1), category: "Utilities", note: "Con Ed electric", at: at(-20) },
-      { amount: 60, paidBy: m(2), category: "Repairs", note: "Plumber, kitchen sink", at: at(-9) },
+      { amount: 60, paidBy: m(2), category: "Repairs", note: "Leaky kitchen faucet", at: at(-9), repairId: "r2" },
+      { amount: 45, paidBy: m(0), category: "Repairs", note: "Doorknob hole in the bedroom wall", at: at(-4), repairId: "r4", splitWith: [m(3)] },
       { amount: 86.4, paidBy: m(3), category: "Groceries", note: "Trader Joe's run", at: at(-6) },
       { amount: 31.6, paidBy: m(0), category: "Groceries", note: "Paper towels & dish soap", at: at(-2) },
     ],
@@ -207,5 +231,19 @@ export function newHouse(agreement: House["agreement"]): House {
       { kind: "Away", start: at(5, 9), end: at(7, 21), by: m(3), note: "Visiting family for the weekend" },
       { kind: "Breakfast", start: at(6, 10), end: at(6, 12), by: m(0), note: "Pancakes for the house" },
     ],
+  };
+}
+
+/** The Bills entry for a repair's cost: split by everyone, or charged to one roommate. */
+export function repairBill(repair: Repair): Bill {
+  const cost = repair.cost!;
+  return {
+    amount: cost.amount,
+    paidBy: cost.paidBy,
+    category: "Repairs",
+    note: repair.title,
+    at: new Date().toISOString(),
+    repairId: repair.id,
+    ...(cost.split === "Individual" ? { splitWith: [cost.responsible] } : {}),
   };
 }

@@ -26,6 +26,9 @@ const PATHS = {
   down: "m6 9 6 6 6-6",
   download: "M12 4v11M7 10l5 5 5-5M5 20h14",
   pencil: "M4 20h4L19 9l-4-4L4 16zM14 6l4 4",
+  wrench: "M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17v3h3l5.2-5.2a4 4 0 0 0 5.3-5.3l-2.6 2.6-2.3-.7-.7-2.3z",
+  image: "M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01",
+  more: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
 };
 
 export type IconName = keyof typeof PATHS;

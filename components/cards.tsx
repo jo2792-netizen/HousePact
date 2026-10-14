@@ -69,7 +69,7 @@ export function Stat({ label, value, sub, href, alert }: { label: string; value:
     <>
       <p className="text-subhead text-secondary">{label}</p>
       <p className={`mt-1 text-title2 font-bold ${alert ? "text-danger" : ""}`}>{value}</p>
-      <p className="truncate text-subhead text-secondary">{sub}</p>
+      <p className="line-clamp-2 text-subhead text-secondary">{sub}</p>
     </>
   );
   return href ? (
@@ -248,7 +248,12 @@ export function BillRow({ h, b }: { h: House; b: Bill }) {
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold">{payment ? `${name(b.paidBy)} paid ${name(b.paidTo!).replace("You", "you")}` : b.note || b.category}</p>
         <p className="text-subhead text-secondary">
-          {payment ? "Payment" : b.category === HOUSEPACT ? "Monthly subscription" : `${b.category} · paid by ${name(b.paidBy).replace("You", "you")}`} · {day(b.at)}
+          {payment
+            ? "Payment"
+            : b.category === HOUSEPACT
+              ? "Monthly subscription"
+              : `${b.repairId ? "Repair" : b.category} · paid by ${name(b.paidBy).replace("You", "you")}${b.splitWith?.length === 1 ? ` · charged to ${name(b.splitWith[0]).replace("You", "you")}` : ""}`}{" "}
+          · {day(b.at)}
         </p>
       </div>
       <span className={`font-semibold tabular-nums ${payment ? "text-secondary" : ""}`}>{money(b.amount)}</span>
