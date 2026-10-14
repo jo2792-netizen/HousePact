@@ -4,7 +4,7 @@ Build everything below in one pass, keeping each feature as simple as possible. 
 
 ## Build
 - [x] Next.js app with no landing page. It opens on Setup (first visit) or Home.
-- [x] Onboarding: welcome (Load Sample Answers) → household details → 8 questions → review → agreement → Home
+- [x] Onboarding: welcome → household details (all pre-filled) → 8 questions → review → agreement → Home
 - [x] Bottom tabs: Home, Pact, Chores, Bills, Calendar
 - [x] Home: today summary, WiFi tap-to-copy, trash day, contacts & emergency info, condition notes, and a small Reset option
 - [x] Agreement: formal document generated from the answers, type-to-sign, Fully Executed status, Download as PDF
@@ -18,5 +18,5 @@ Build everything below in one pass, keeping each feature as simple as possible. 
 - [x] Remove anything not in PRD.md
 
 ## Test (demo flow)
-- [x] Load Sample Answers → review → generate the agreement → everyone signs → Home → check off a chore → add a bill and see balances update → add a Lunch or Party that clashes with someone's interview or early night → Reset works
+- [x] Get Started → tap through the pre-filled steps → review → generate the agreement → everyone signs → Home → check off a chore → add a bill and see balances update → add a Lunch or Party that clashes with someone's interview or early night → Reset works
 - [x] Works on a phone-sized screen with no errors

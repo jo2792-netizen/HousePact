@@ -6,7 +6,7 @@ import { AgreementDocument } from "@/components/agreement";
 import { Icon } from "@/components/icons";
 import { QUESTIONS } from "@/components/questions";
 import { BackButton, Field, NavBar } from "@/components/ui";
-import { SAMPLE_NAMES, blankHousehold, defaultAnswers, fitAnswers, longDate, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
+import { SAMPLE_NAMES, fitAnswers, longDate, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
 import { newHouse } from "@/lib/house";
 import { canUndoReset, save, undoReset, useHouse } from "@/lib/store";
 
@@ -31,8 +31,9 @@ export default function Setup() {
 
 function Onboarding() {
   const [screen, setScreen] = useState(WELCOME);
-  const [household, setHousehold] = useState(blankHousehold);
-  const [answers, setAnswers] = useState(() => defaultAnswers(4));
+  // Everything starts filled in with the sample household and answers, so the demo is just taps
+  const [household, setHousehold] = useState(() => sampleDraft().household);
+  const [answers, setAnswers] = useState(() => sampleDraft().answers);
   const [signatures, setSignatures] = useState<(string | null)[]>([]);
   const [fromReview, setFromReview] = useState(false); // editing one section from Review returns to Review
   const names = household.names;
@@ -57,16 +58,10 @@ function Onboarding() {
     setFromReview(true);
     go(s);
   };
-  const loadSample = () => {
+  const startOver = () => {
     const sample = sampleDraft();
     setHousehold(sample.household);
     setAnswers(sample.answers);
-    setSignatures([]);
-    go(REVIEW);
-  };
-  const startOver = () => {
-    setHousehold(blankHousehold());
-    setAnswers(defaultAnswers(4));
     setSignatures([]);
     setFromReview(false);
     go(WELCOME);
@@ -100,15 +95,11 @@ function Onboarding() {
             </li>
           ))}
         </ol>
-        <p className="text-subhead text-secondary">Takes about ten minutes together. Every question starts on a recommended answer.</p>
+        <p className="text-subhead text-secondary">Every answer starts filled in with a sample household, so you can tap straight through or change anything.</p>
         <div className="mt-auto flex flex-col gap-2">
           <button className="btn" onClick={() => go(HOUSEHOLD)}>
             Get Started
           </button>
-          <button className="btn-secondary" onClick={loadSample}>
-            Load Sample Answers
-          </button>
-          <p className="text-center text-subhead text-secondary">Fills in a sample household and jumps to Review.</p>
           {canUndoReset() && (
             <button className="link self-center" onClick={undoReset}>
               Undo Reset
