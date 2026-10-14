@@ -21,6 +21,18 @@
 @theme inline {
   --font-heading: var(--font-bricolage);
   --font-sans: var(--font-figtree);
+  --font-serif: var(--font-source-serif);
+  --font-script: var(--font-dancing);
+}
+
+/* Download as PDF: print only the agreement, on clean pages */
+@media print {
+  @page {
+    margin: 0.75in;
+  }
+  body {
+    background: white;
+  }
 }
 
 @layer base {

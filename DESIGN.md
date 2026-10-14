@@ -29,7 +29,7 @@ Calm and uncluttered, like a clean fridge door with one sticky note.
 | Alert | `#E5484D` | Money owed, conflicts |
 
 - **Roommate dots:** Each roommate gets a color dot with their initial (blue `#4F7CFF`, green `#2BB673`, orange `#F28C38`, purple `#A66CFF`, pink `#EC5FA0`, teal `#20B2C4`). Use dots instead of names wherever possible.
-- **Signature moment:** The agreement appears as a yellow sticky note showing everyone's dots, and it gets a check when all have agreed. This is the only decorative element.
+- **Signature moment:** The agreement appears as a formal paper document (serif type, numbered articles, ruled tables) that each roommate signs by typing their name, shown in a script font. When all have signed it reads "Fully Executed." No emojis anywhere in the app.
 - **Type:** Bricolage Grotesque for headings, Figtree for everything else (Google Fonts). 28px titles, 17px body, nothing under 14px.
 - **Shape:** Generous spacing, 12px rounded cards, pill buttons, no shadows or gradients.
 
@@ -48,10 +48,10 @@ Home                      Pact (quiz)
 │ Apartment info   >   │  └──────────────────────┘
 └──────────────────────┘
 ```
-- **Pact:** One question per screen, then the sticky note. Tap a dot to agree.
+- **Agreement onboarding:** One topic per screen with "Step X of 8," a one-line reason it matters, and option cards with helper text and a "Recommended" tag. Back keeps answers.
 - **Chores:** List with an assignee dot and a big round checkbox. Done items move to the bottom.
 - **Bills:** Balances in large type at the top, expenses below. "Add bill" opens one sheet: amount, paid by, category, Save.
-- **Calendar:** A simple upcoming list (not a month grid). Event types are emoji chips (💼 Interview, 🎉 Party, 🍽️ Dinner…) grouped as Needs quiet / Busy house / Heads-up, with a red warning on conflicts.
+- **Calendar:** A simple upcoming list (not a month grid). Event types are chips (Interview, Party, Dinner…) grouped as Needs quiet / Busy house / Heads-up, with a red warning on conflicts.
 
 ## Quality
 - Instant feedback on every tap.

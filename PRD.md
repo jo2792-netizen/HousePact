@@ -18,13 +18,13 @@ College students and young professionals sharing an apartment with 2–6 roommat
 
 ## Features (simple version of each)
 
-**Setup.** The app opens on a short onboarding for the main tenant: a welcome screen, their name and place, quickly adding roommates (type a name or tap a suggestion), and the pact quiz. It then opens on Home, filled with realistic example info, chores, bills, and events to explore. A small Reset starts onboarding over.
+**Setup.** The app opens on an onboarding flow: a welcome screen with a "Load Sample Answers" button for live demos, household details (address, 2 to 6 roommate names, lease dates, effective date), eight questions, a review screen with an Edit link per section, and the generated agreement. "Open Household Dashboard" then opens Home, filled with realistic example info, chores, bills, and events. A small Reset starts onboarding over.
 
 **Apartment Info.** WiFi (tap to copy), trash pickup days, super/HOA contacts, and emergency info (contacts, shutoff valve, breaker box).
 
 **Condition Tracker.** A short list of notes on the apartment's condition (e.g. "Scratch on kitchen counter, move-in").
 
-**Agreement.** A short multiple-choice quiz covering kitchen & cleanliness, shared spaces & belongings, guests, quiet hours, sublets, and consequences. The answers fill in an agreement template, and each roommate taps to agree.
+**Agreement.** Eight question screens (cleanliness; chores; rent, utilities, and groceries; food and belongings; guests; quiet hours; damage; sublets, move-out, and disagreements) using sliders, option cards, toggles, and dropdowns, each with a recommended default. A template function turns the answers into a formal Residential Roommate Agreement: ten numbered articles, a rent split table, a chore rotation schedule, standard provisions, and type-to-sign signatures that mark it "Fully Executed." It can be downloaded as a PDF and is viewable later from the Pact tab.
 
 **Chores.** Chores with an assignee and a frequency (daily/weekly). Check one off to log who did it and when.
 

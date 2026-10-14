@@ -27,9 +27,7 @@ export default function Calendar() {
           return (
             <li key={i} className={`card flex flex-col gap-1 border-2 ${clash ? "border-alert" : "border-transparent"}`}>
               <div className="flex items-center justify-between gap-3">
-                <p className="font-semibold">
-                  {type.emoji} {e.kind}
-                </p>
+                <p className="font-semibold">{e.kind}</p>
                 <Dot i={e.by} name={h.mates[e.by]} />
               </div>
               {e.note && <p>{e.note}</p>}
@@ -39,7 +37,7 @@ export default function Calendar() {
               </p>
               {clash && (
                 <p className="font-semibold text-alert">
-                  ⚠️ Clashes with {clash.by === h.me ? "your" : `${h.mates[clash.by]}'s`} {clash.kind.toLowerCase()}
+                  Conflict: clashes with {clash.by === h.me ? "your" : `${h.mates[clash.by]}'s`} {clash.kind.toLowerCase()}
                 </p>
               )}
               <a href={googleCalendarLink(e, h.name)} target="_blank" rel="noreferrer" className="self-start py-2 text-[15px] underline">
@@ -85,9 +83,9 @@ function AddEvent({ h, onClose }: { h: House; onClose: () => void }) {
           <div className="flex flex-wrap gap-2">
             {Object.entries(EVENTS)
               .filter(([, type]) => type.mood === mood)
-              .map(([k, type]) => (
+              .map(([k]) => (
                 <Choice key={k} on={kind === k} onClick={() => pickKind(k)}>
-                  {type.emoji} {k}
+                  {k}
                 </Choice>
               ))}
           </div>

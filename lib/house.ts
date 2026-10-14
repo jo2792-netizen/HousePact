@@ -1,58 +1,33 @@
+import { shortName } from "./agreement";
 import type { Bill, CalEvent, Chore, House } from "./store";
 
 export const COLORS = ["#4F7CFF", "#2BB673", "#F28C38", "#A66CFF", "#EC5FA0", "#20B2C4"];
 export const CATEGORIES = ["Groceries", "Utilities", "Repairs", "Furniture"];
 export const HOUSEPACT = "Housepact";
-export const EMOJI: Record<string, string> = {
-  Groceries: "🛒",
-  Utilities: "💡",
-  Repairs: "🔧",
-  Furniture: "🛋️",
-  Housepact: "🏠",
-};
 
 // Calendar event types. "quiet" events clash with "busy" ones that overlap them.
 export type Mood = "quiet" | "busy" | "info";
 export const MOODS: Record<Mood, string> = { quiet: "Needs quiet", busy: "Busy house", info: "Heads-up" };
-export const EVENTS: Record<string, { emoji: string; mood: Mood; from: string; to: string }> = {
-  Interview: { emoji: "💼", mood: "quiet", from: "10:00", to: "11:00" },
-  "Study session": { emoji: "📚", mood: "quiet", from: "14:00", to: "18:00" },
-  "Work call": { emoji: "💻", mood: "quiet", from: "09:00", to: "10:00" },
-  "Early night": { emoji: "😴", mood: "quiet", from: "22:00", to: "07:00" },
-  "Quiet time": { emoji: "🤫", mood: "quiet", from: "23:00", to: "07:00" },
-  Party: { emoji: "🎉", mood: "busy", from: "20:00", to: "23:00" },
-  Dinner: { emoji: "🍽️", mood: "busy", from: "19:00", to: "21:00" },
-  Breakfast: { emoji: "🥞", mood: "busy", from: "09:00", to: "10:30" },
-  Lunch: { emoji: "🥪", mood: "busy", from: "12:00", to: "13:30" },
-  "Club meeting": { emoji: "👥", mood: "busy", from: "18:00", to: "20:00" },
-  "Game night": { emoji: "🎮", mood: "busy", from: "20:00", to: "23:00" },
-  "Overnight guest": { emoji: "🛏️", mood: "busy", from: "20:00", to: "10:00" },
-  "Repair visit": { emoji: "🔧", mood: "busy", from: "09:00", to: "12:00" },
-  "House meeting": { emoji: "🏠", mood: "info", from: "19:00", to: "20:00" },
-  Away: { emoji: "🧳", mood: "info", from: "09:00", to: "21:00" },
-  Delivery: { emoji: "📦", mood: "info", from: "12:00", to: "16:00" },
+export const EVENTS: Record<string, { mood: Mood; from: string; to: string }> = {
+  Interview: { mood: "quiet", from: "10:00", to: "11:00" },
+  "Study session": { mood: "quiet", from: "14:00", to: "18:00" },
+  "Work call": { mood: "quiet", from: "09:00", to: "10:00" },
+  "Early night": { mood: "quiet", from: "22:00", to: "07:00" },
+  "Quiet time": { mood: "quiet", from: "23:00", to: "07:00" },
+  Party: { mood: "busy", from: "20:00", to: "23:00" },
+  Dinner: { mood: "busy", from: "19:00", to: "21:00" },
+  Breakfast: { mood: "busy", from: "09:00", to: "10:30" },
+  Lunch: { mood: "busy", from: "12:00", to: "13:30" },
+  "Club meeting": { mood: "busy", from: "18:00", to: "20:00" },
+  "Game night": { mood: "busy", from: "20:00", to: "23:00" },
+  "Overnight guest": { mood: "busy", from: "20:00", to: "10:00" },
+  "Repair visit": { mood: "busy", from: "09:00", to: "12:00" },
+  "House meeting": { mood: "info", from: "19:00", to: "20:00" },
+  Away: { mood: "info", from: "09:00", to: "21:00" },
+  Delivery: { mood: "info", from: "12:00", to: "16:00" },
 };
 const OPPOSITE: Record<Mood, Mood | null> = { quiet: "busy", busy: "quiet", info: null };
 const PRICE = 8; // Housepact subscription per house, per month
-
-// Pact quiz: one question per topic. The picked answer fills in the {} of the rule.
-export const QUIZ = [
-  { topic: "🍽️ Kitchen", q: "Dishes get washed", options: ["Right away", "By bedtime", "Within 2 days"], rule: "Dishes get washed {}." },
-  { topic: "🛋️ Shared stuff", q: "Borrowing food or stuff", options: ["Ask first", "Basics are fine", "Anything goes"], rule: "Borrowing food or stuff: {}." },
-  { topic: "🛏️ Guests", q: "Overnight guests", options: ["Give a heads-up", "Max 2 nights a week", "Ask everyone first"], rule: "Overnight guests: {}." },
-  { topic: "🌙 Quiet hours", q: "Quiet hours start at", options: ["10pm", "11pm", "Midnight"], rule: "Quiet hours start at {}." },
-  { topic: "🔑 Sublets", q: "Subletting your room", options: ["Not allowed", "Allowed if all agree", "Allowed with notice"], rule: "Subletting is {}." },
-  { topic: "⚖️ Breaking the pact", q: "If someone breaks the pact", options: ["We talk it out", "We hold a house meeting", "They restock supplies"], rule: "If someone breaks the pact, {}." },
-];
-
-export const pactRules = (answers: number[]) =>
-  QUIZ.map(({ options, rule }, i) => {
-    const answer = options[answers[i]];
-    return rule.replace("{}", answer[0].toLowerCase() + answer.slice(1));
-  });
-
-/** Add a roommate to a list, or take them off if they're already on it. */
-export const toggle = (list: number[], i: number) => (list.includes(i) ? list.filter((x) => x !== i) : [...list, i]);
 
 /** Daily chores stay done for the day, weekly chores for 7 days. */
 export function isDone(chore: Chore) {
@@ -107,7 +82,7 @@ export const headsUp = (events: CalEvent[]) =>
   );
 
 export function googleCalendarLink(event: CalEvent, houseName: string) {
-  const title = `${EVENTS[event.kind].emoji} ${event.note || event.kind} · ${houseName}`;
+  const title = `${event.note || event.kind} · ${houseName}`;
   const utc = (iso: string) => iso.replace(/[-:]|\.\d+/g, ""); // 20261015T180000Z
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${utc(event.start)}/${utc(event.end)}`;
 }
@@ -123,7 +98,9 @@ export const when = (iso: string) => `${new Date(iso).toLocaleDateString("en-US"
  * The house made at the end of onboarding. It comes with realistic example
  * info, chores, bills, and events (dated around today) so every tab has something to show.
  */
-export function newHouse(name: string, mates: string[], answers: number[], agreed: number[]): House {
+export function newHouse(agreement: House["agreement"]): House {
+  const name = shortName(agreement.household.address);
+  const mates = agreement.household.names.map((n) => n.split(" ")[0]); // first names on the dashboard
   const now = new Date();
   const at = (days: number, hour = 12) =>
     new Date(now.getFullYear(), now.getMonth(), now.getDate() + days, hour).toISOString();
@@ -139,8 +116,7 @@ export function newHouse(name: string, mates: string[], answers: number[], agree
     mates,
     me: 0,
     since: moveIn,
-    answers,
-    agreed,
+    agreement,
     info: {
       wifi: `${name.replace(/\s/g, "")}-5G`,
       password: "sunnyside42",

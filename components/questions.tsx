@@ -1,0 +1,310 @@
+import type { ReactNode } from "react";
+import { Field, OptionCards, Recommended, Select, Slider, Toggle } from "@/components/ui";
+import {
+  BORROWING, CAPS, CHORE_SYSTEMS, CLEAN_DEFAULT, CLEAN_LEVELS, DISHES, DISPUTES, DUE, GROCERIES, GUEST_NOTICE, INSURANCE,
+  ITEMS, JOINT, MAKEUP, MEETINGS, NIGHTS_DEFAULT, NOTICE, PARTIES, QUIET_PRESETS, REPORT, SPLITS, SUBLET, UNATTRIBUTED,
+  UTILITIES, ZONES, clock, dollars, evenPercents, percentTotal, rentShares, type Answers,
+} from "@/lib/agreement";
+
+type Props = { a: Answers; set: (changes: Partial<Answers>) => void; names: string[] };
+
+/** The eight questions: one topic per screen. `problem` explains what blocks Next, if anything. */
+export const QUESTIONS: {
+  title: string;
+  why: string;
+  Body: (props: Props) => ReactNode;
+  problem?: (a: Answers) => string | null;
+}[] = [
+  {
+    title: "Cleanliness",
+    why: "Different ideas of \"clean\" cause more roommate conflict than almost anything else.",
+    Body: ({ a, set }) => {
+      const level = CLEAN_LEVELS[a.clean - 1];
+      return (
+        <>
+          <Field label="Standard for shared spaces" help="Slide to the level everyone can live with.">
+            <Slider label="Cleanliness standard" min={1} max={5} value={a.clean} onChange={(clean) => set({ clean })} left="Relaxed" right="Spotless" />
+            <div className="rounded-xl bg-white px-4 py-3" aria-live="polite">
+              <p className="flex items-center justify-between gap-2 font-semibold">
+                {level.label}
+                {a.clean === CLEAN_DEFAULT && <Recommended />}
+              </p>
+              <p className="text-sm text-muted">{level.help}</p>
+            </div>
+          </Field>
+          <Field label="Dishes are washed">
+            <OptionCards options={DISHES} value={a.dishes} onChange={(dishes) => set({ dishes })} columns={3} />
+          </Field>
+        </>
+      );
+    },
+  },
+  {
+    title: "Chores",
+    why: "A clear system means nobody has to keep score or ask twice.",
+    Body: ({ a, set, names }) => (
+      <>
+        <Field label="How chores are shared" help={`Four zones: ${ZONES.map((z) => z.name.toLowerCase()).join(", ")}.`}>
+          <OptionCards options={CHORE_SYSTEMS} value={a.chores} onChange={(chores) => set({ chores })} columns={3} />
+        </Field>
+        {a.chores === "fixed" && (
+          <Field label="Who owns each zone">
+            {ZONES.map((z, i) => (
+              <div key={z.name} className="flex items-center gap-3">
+                <span className="w-40 shrink-0">{z.name}</span>
+                <Select
+                  label={`${z.name} owner`}
+                  options={names.map((name, j) => ({ value: j, label: name }))}
+                  value={a.owners[i]}
+                  onChange={(o) => set({ owners: a.owners.map((x, k) => (k === i ? o : x)) })}
+                />
+              </div>
+            ))}
+          </Field>
+        )}
+        <Field label="Missed chores are made up">
+          <OptionCards options={MAKEUP} value={a.makeup} onChange={(makeup) => set({ makeup })} columns={3} />
+        </Field>
+      </>
+    ),
+  },
+  {
+    title: "Rent, utilities, and groceries",
+    why: "Money is easier to talk about before anyone is owed any.",
+    problem: (a) =>
+      !(a.rent > 0)
+        ? "Enter the total monthly rent."
+        : a.split === "custom" && percentTotal(a) !== 100
+          ? `Percentages must total 100%. They total ${percentTotal(a)}%.`
+          : null,
+    Body: ({ a, set, names }) => {
+      const shares = rentShares(a, names.length);
+      return (
+        <>
+          <Field label="Total monthly rent">
+            <label className="field flex items-center gap-1 text-xl font-semibold">
+              $
+              <input
+                inputMode="decimal"
+                aria-label="Total monthly rent"
+                placeholder="0"
+                value={a.rent || ""}
+                onChange={(e) => set({ rent: Number(e.target.value.replace(/[^\d.]/g, "")) || 0 })}
+                className="min-w-0 flex-1 outline-none"
+              />
+            </label>
+          </Field>
+          <Field label="How rent is split">
+            <OptionCards
+              options={SPLITS}
+              value={a.split}
+              onChange={(split) => set({ split, percents: split === "custom" ? a.percents : evenPercents(names.length) })}
+              columns={2}
+            />
+            <div className="divide-y divide-line rounded-xl bg-white px-4">
+              {names.map((name, i) => (
+                <div key={i} className="flex h-14 items-center gap-3">
+                  <span className="min-w-0 flex-1 truncate">{name}</span>
+                  {a.split === "custom" ? (
+                    <label className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={0.5}
+                        aria-label={`${name} percentage`}
+                        value={a.percents[i]}
+                        onChange={(e) => set({ percents: a.percents.map((p, j) => (j === i ? Number(e.target.value) || 0 : p)) })}
+                        className="w-20 rounded-lg border border-line px-2 py-1 text-right"
+                      />
+                      %
+                    </label>
+                  ) : (
+                    <span className="text-muted">{+(100 / names.length).toFixed(2)}%</span>
+                  )}
+                  <span className="w-24 text-right font-semibold">{dollars(shares[i].amount)}</span>
+                </div>
+              ))}
+              {a.split === "custom" && (
+                <div className={`flex h-12 items-center justify-between text-sm ${percentTotal(a) === 100 ? "text-muted" : "font-semibold text-alert"}`}>
+                  <span>Total</span>
+                  <span>
+                    {percentTotal(a)}% {percentTotal(a) !== 100 && `(${+(100 - percentTotal(a)).toFixed(2)}% ${percentTotal(a) < 100 ? "left" : "over"})`}
+                  </span>
+                </div>
+              )}
+            </div>
+          </Field>
+          <Field label="Who pays the landlord" help="Shares go to this person, who pays the full rent.">
+            <Select
+              label="Who pays the landlord"
+              options={[...names.map((name, i) => ({ value: i, label: `${name} collects and pays` })), { value: -1, label: "Everyone pays the landlord directly" }]}
+              value={a.payer}
+              onChange={(payer) => set({ payer })}
+            />
+          </Field>
+          <Field label="Shares are due">
+            <OptionCards options={DUE} value={a.due} onChange={(due) => set({ due })} columns={3} />
+          </Field>
+          <Field label="Utilities">
+            <OptionCards options={UTILITIES} value={a.utilities} onChange={(utilities) => set({ utilities })} columns={3} />
+          </Field>
+          <Field label="Groceries">
+            <OptionCards options={GROCERIES} value={a.groceries} onChange={(groceries) => set({ groceries })} columns={3} />
+          </Field>
+        </>
+      );
+    },
+  },
+  {
+    title: "Food and belongings",
+    why: "Small things like a missing yogurt or a jacket on the couch add up fast.",
+    Body: ({ a, set }) => (
+      <>
+        <Field label="Using someone else's food">
+          <OptionCards options={BORROWING} value={a.borrowing} onChange={(borrowing) => set({ borrowing })} columns={3} />
+        </Field>
+        <Field label="Personal items can stay in shared spaces for">
+          <OptionCards options={ITEMS} value={a.items} onChange={(items) => set({ items })} columns={3} />
+        </Field>
+        <Field label="Things you buy together, when someone moves out">
+          <OptionCards options={JOINT} value={a.joint} onChange={(joint) => set({ joint })} columns={2} />
+        </Field>
+      </>
+    ),
+  },
+  {
+    title: "Guests",
+    why: "Guests change the home for everyone, so it helps to agree on limits upfront.",
+    Body: ({ a, set }) => (
+      <>
+        <Field label="Notice for overnight guests">
+          <OptionCards options={GUEST_NOTICE} value={a.guestNotice} onChange={(guestNotice) => set({ guestNotice })} columns={3} />
+        </Field>
+        <Field label="Longest stay in a row" help="After this, everyone has to approve.">
+          <div className="rounded-xl bg-white px-4 py-3">
+            <p className="flex items-center justify-between font-semibold">
+              {a.nights} night{a.nights === 1 ? "" : "s"}
+              {a.nights === NIGHTS_DEFAULT && <Recommended />}
+            </p>
+            <Slider label="Maximum consecutive nights" min={1} max={7} value={a.nights} onChange={(nights) => set({ nights })} left="1 night" right="7 nights" />
+          </div>
+        </Field>
+        <Field label="Guest nights per month" help="Total across all of one roommate's guests.">
+          <Select
+            label="Guest nights per month"
+            options={CAPS.map((c) => ({ value: c.value, label: c.label + (c.rec ? " (Recommended)" : "") }))}
+            value={a.cap}
+            onChange={(cap) => set({ cap })}
+          />
+        </Field>
+        <Field label="Parties" help="A party means more than six guests at once.">
+          <OptionCards options={PARTIES} value={a.parties} onChange={(parties) => set({ parties })} columns={3} />
+        </Field>
+      </>
+    ),
+  },
+  {
+    title: "Quiet hours",
+    why: "Sleep, exams, and early shifts depend on knowing when the house goes quiet.",
+    problem: (a) => (a.weeknight.every(Boolean) && a.weekend.every(Boolean) ? null : "Set all four quiet-hour times."),
+    Body: ({ a, set }) => {
+      const presets = QUIET_PRESETS.map((p) => ({
+        ...p,
+        help: p.weeknight ? `Weeknights ${clock(p.weeknight[0])} to ${clock(p.weeknight[1])}. Weekends ${clock(p.weekend![0])} to ${clock(p.weekend![1])}.` : p.help,
+      }));
+      const time = (key: "weeknight" | "weekend", i: 0 | 1, labelText: string) => (
+        <label className="flex flex-1 flex-col gap-1 text-sm text-muted">
+          {labelText}
+          <input
+            type="time"
+            className="field text-ink"
+            value={a[key][i]}
+            onChange={(e) => set({ [key]: (i === 0 ? [e.target.value, a[key][1]] : [a[key][0], e.target.value]) as [string, string] })}
+          />
+        </label>
+      );
+      return (
+        <>
+          <Field label="Quiet hours" help="Weeknights are Sunday to Thursday. Weekends are Friday and Saturday.">
+            <OptionCards
+              options={presets}
+              value={a.quiet}
+              onChange={(quiet) => {
+                const p = QUIET_PRESETS.find((x) => x.value === quiet)!;
+                set(p.weeknight ? { quiet, weeknight: p.weeknight, weekend: p.weekend! } : { quiet });
+              }}
+              columns={2}
+            />
+          </Field>
+          {a.quiet === "custom" && (
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-3">
+                {time("weeknight", 0, "Weeknights from")}
+                {time("weeknight", 1, "Until")}
+              </div>
+              <div className="flex gap-3">
+                {time("weekend", 0, "Weekends from")}
+                {time("weekend", 1, "Until")}
+              </div>
+            </div>
+          )}
+          <Toggle
+            label="Headphones during quiet hours (Recommended)"
+            help="Music, shows, games, and calls in shared spaces use headphones."
+            on={a.headphones}
+            onChange={(headphones) => set({ headphones })}
+          />
+        </>
+      );
+    },
+  },
+  {
+    title: "Damage",
+    why: "Deciding who pays before something breaks keeps the deposit conversation calm.",
+    Body: ({ a, set }) => (
+      <>
+        <Field label="Report damage or problems">
+          <OptionCards options={REPORT} value={a.report} onChange={(report) => set({ report })} columns={3} />
+        </Field>
+        <Field label="When no one knows who caused it">
+          <OptionCards options={UNATTRIBUTED} value={a.unattributed} onChange={(unattributed) => set({ unattributed })} columns={2} />
+        </Field>
+        <Field label="Renter's insurance">
+          <OptionCards options={INSURANCE} value={a.insurance} onChange={(insurance) => set({ insurance })} columns={3} />
+        </Field>
+        <Toggle
+          label="Move-in photos (Recommended)"
+          help="Photograph every room in the first week to protect everyone's deposit."
+          on={a.photos}
+          onChange={(photos) => set({ photos })}
+        />
+      </>
+    ),
+  },
+  {
+    title: "Sublets, move-out, and disagreements",
+    why: "Plans change. Agreeing on the exit and on how to settle disputes protects everyone.",
+    Body: ({ a, set }) => (
+      <>
+        <Field label="Subletting a room">
+          <OptionCards options={SUBLET} value={a.sublet} onChange={(sublet) => set({ sublet })} columns={3} />
+        </Field>
+        <Field label="Notice before moving out">
+          <OptionCards options={NOTICE} value={a.notice} onChange={(notice) => set({ notice })} columns={3} />
+        </Field>
+        <Field label="When there's a disagreement">
+          <OptionCards options={DISPUTES} value={a.disputes} onChange={(disputes) => set({ disputes })} columns={3} />
+        </Field>
+        <Field label="House meetings">
+          <Select
+            label="House meetings"
+            options={MEETINGS.map((m) => ({ value: m.value, label: m.label + (m.rec ? " (Recommended)" : "") }))}
+            value={a.meetings}
+            onChange={(meetings) => set({ meetings })}
+          />
+        </Field>
+      </>
+    ),
+  },
+];

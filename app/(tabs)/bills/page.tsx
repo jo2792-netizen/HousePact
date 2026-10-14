@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Choice, Dot, DotPicker, Field, Sheet } from "@/components/ui";
-import { CATEGORIES, EMOJI, HOUSEPACT, allBills, day, debts, money } from "@/lib/house";
+import { CATEGORIES, HOUSEPACT, allBills, day, debts, money } from "@/lib/house";
 import { update, useHouse, type House } from "@/lib/store";
 
 export default function Bills() {
@@ -32,9 +32,7 @@ export default function Bills() {
         {allBills(h).map((b, i) => (
           <li key={i} className="flex items-center gap-3 py-3">
             <div className="min-w-0 flex-1">
-              <p>
-                {EMOJI[b.category]} {b.note || b.category}
-              </p>
+              <p>{b.note || b.category}</p>
               <p className="text-sm text-muted">
                 {b.category === HOUSEPACT ? "Monthly" : b.category} · {day(b.at)}
               </p>
@@ -89,7 +87,7 @@ function AddBill({ h, onClose }: { h: House; onClose: () => void }) {
         <div className="grid grid-cols-2 gap-2">
           {CATEGORIES.map((c) => (
             <Choice key={c} on={category === c} onClick={() => setCategory(c)}>
-              {EMOJI[c]} {c}
+              {c}
             </Choice>
           ))}
         </div>

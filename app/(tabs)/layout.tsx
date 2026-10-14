@@ -25,8 +25,8 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <>
-      <main className="mx-auto flex max-w-md flex-col gap-5 px-4 pt-8 pb-28">{children}</main>
-      <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-white pb-[env(safe-area-inset-bottom)]">
+      <main className="mx-auto flex max-w-md flex-col gap-5 px-4 pt-8 pb-28 print:max-w-none print:p-0">{children}</main>
+      <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] print:hidden">
         <div className="mx-auto flex max-w-md">
           {TABS.map(([href, label]) => {
             const active = href === "/" ? path === "/" || path === "/info" : path.startsWith(href);

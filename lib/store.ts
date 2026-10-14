@@ -1,5 +1,6 @@
 // The one place that saves data. Everything lives in this browser's localStorage.
 import { useSyncExternalStore } from "react";
+import type { Answers, Household } from "./agreement";
 
 export type Chore = { name: string; who: number; often: "Daily" | "Weekly"; doneBy?: number; doneAt?: string };
 export type Bill = { amount: number; paidBy: number; category: string; at: string; note?: string };
@@ -12,14 +13,14 @@ export type House = {
   since: string; // setup date, starts the monthly Housepact bill
   info: Record<string, string>; // WiFi, trash days, contacts, emergency info
   notes: { text: string; at: string }[]; // condition tracker
-  answers: number[]; // pact quiz answers
-  agreed: number[]; // roommates who agreed to the pact
+  // the Roommate Agreement made during onboarding; signatures hold when each roommate signed
+  agreement: { household: Household; answers: Answers; signatures: (string | null)[] };
   chores: Chore[];
   bills: Bill[];
   events: CalEvent[];
 };
 
-const KEY = "housepact-v3"; // change when the data shape changes, so old saves are ignored
+const KEY = "housepact-v4"; // change when the data shape changes, so old saves are ignored
 const listeners = new Set<() => void>();
 let current: House | null | undefined; // undefined = not read yet
 let beforeReset: House | null = null;

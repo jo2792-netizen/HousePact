@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
-import { COLORS, pactRules } from "@/lib/house";
+import type { Option } from "@/lib/agreement";
+import { COLORS } from "@/lib/house";
 
-/** A roommate's color dot with their initial. Hollow = not filled in (e.g. hasn't agreed yet). */
-export function Dot({ i, name, big, hollow }: { i: number; name: string; big?: boolean; hollow?: boolean }) {
+/** A roommate's color dot with their initial. */
+export function Dot({ i, name }: { i: number; name: string }) {
   return (
     <span
       role="img"
       aria-label={name}
       title={name}
-      className={`inline-flex shrink-0 items-center justify-center rounded-full border-2 font-bold ${big ? "size-12 text-lg" : "size-10"}`}
-      style={{ borderColor: COLORS[i], background: hollow ? "white" : COLORS[i] }}
+      className="inline-flex size-10 shrink-0 items-center justify-center rounded-full font-bold"
+      style={{ background: COLORS[i] }}
     >
       {name[0]?.toUpperCase()}
     </span>
@@ -50,54 +51,14 @@ export function Choice({ on, onClick, children }: { on: boolean; onClick: () => 
   );
 }
 
-/** The house agreement as a sticky note. Everyone taps their dot to agree; it gets a ✓ when all have. */
-export function PactNote({ title, mates, answers, agreed, onToggle }: {
-  title: string;
-  mates: string[];
-  answers: number[];
-  agreed: number[];
-  onToggle: (i: number) => void;
-}) {
-  const everyone = agreed.length === mates.length;
-  return (
-    <div className="flex -rotate-1 flex-col gap-4 rounded-xl bg-note p-6">
-      <div className="flex items-start justify-between gap-3">
-        <h2>{title} pact</h2>
-        {everyone && (
-          <span role="img" aria-label="Everyone agreed" className="text-4xl leading-none">
-            ✓
-          </span>
-        )}
-      </div>
-      <ol className="flex list-decimal flex-col gap-2 pl-5">
-        {pactRules(answers).map((rule) => (
-          <li key={rule}>{rule}</li>
-        ))}
-      </ol>
-      <div className="flex flex-wrap gap-2 pt-2">
-        {mates.map((name, i) => {
-          const on = agreed.includes(i);
-          return (
-            <button key={i} aria-label={name} aria-pressed={on} onClick={() => onToggle(i)} className="relative rounded-full">
-              <Dot i={i} name={name} big hollow={!on} />
-              {on && (
-                <span className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full bg-ink text-sm text-white">
-                  ✓
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-      <p>{everyone ? "Everyone agreed" : "Tap your dot to agree"}</p>
-    </div>
-  );
-}
-
-export function Field({ label, children }: { label: string; children: ReactNode }) {
+/** A labeled group of inputs, with optional helper text. */
+export function Field({ label, help, children }: { label: string; help?: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm text-muted">{label}</span>
+      <div>
+        <p className="font-semibold">{label}</p>
+        {help && <p className="text-sm text-muted">{help}</p>}
+      </div>
       {children}
     </div>
   );
@@ -137,5 +98,114 @@ export function Sheet({ title, canSave, onSave, onClose, children }: {
         </button>
       </form>
     </div>
+  );
+}
+
+/** Pick one option from cards that each show a label, helper text, and a "Recommended" tag. */
+export function OptionCards<T>({ options, value, onChange, columns = 1 }: {
+  options: Option<T>[];
+  value: T;
+  onChange: (value: T) => void;
+  columns?: 1 | 2 | 3;
+}) {
+  return (
+    <div role="radiogroup" className={`grid gap-2 ${{ 1: "", 2: "sm:grid-cols-2", 3: "sm:grid-cols-3" }[columns]}`}>
+      {options.map((o) => {
+        const on = o.value === value;
+        return (
+          <button
+            key={String(o.value)}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            onClick={() => onChange(o.value)}
+            className={`flex flex-col items-start gap-1 rounded-xl border-2 bg-white px-4 py-3 text-left ${on ? "border-ink" : "border-line"}`}
+          >
+            <span className="flex w-full items-center justify-between gap-2">
+              <span className="font-semibold">{o.label}</span>
+              {o.rec && <Recommended />}
+            </span>
+            {o.help && <span className="text-sm text-muted">{o.help}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function Recommended() {
+  return <span className="shrink-0 rounded-full bg-paper px-2 py-0.5 text-sm font-semibold text-muted">Recommended</span>;
+}
+
+/** A labeled slider with end labels. */
+export function Slider({ label, min, max, value, onChange, left, right }: {
+  label: string;
+  min: number;
+  max: number;
+  value: number;
+  onChange: (value: number) => void;
+  left: string;
+  right: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <input
+        type="range"
+        aria-label={label}
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="h-12 w-full accent-ink"
+      />
+      <div className="flex justify-between text-sm text-muted">
+        <span>{left}</span>
+        <span>{right}</span>
+      </div>
+    </div>
+  );
+}
+
+/** An on/off switch with a label and helper text. */
+export function Toggle({ label, help, on, onChange }: { label: string; help: string; on: boolean; onChange: (on: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      onClick={() => onChange(!on)}
+      className="flex items-center gap-4 rounded-xl border-2 border-line bg-white px-4 py-3 text-left"
+    >
+      <span className="flex flex-1 flex-col gap-1">
+        <span className="font-semibold">{label}</span>
+        <span className="text-sm text-muted">{help}</span>
+      </span>
+      <span className={`flex h-8 w-14 shrink-0 items-center rounded-full p-1 transition ${on ? "bg-ink" : "bg-line"}`}>
+        <span className={`size-6 rounded-full bg-white transition ${on ? "translate-x-6" : ""}`} />
+      </span>
+    </button>
+  );
+}
+
+/** A dropdown. */
+export function Select<T extends string | number>({ label, options, value, onChange }: {
+  label: string;
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <select
+      aria-label={label}
+      value={String(value)}
+      onChange={(e) => onChange(options.find((o) => String(o.value) === e.target.value)!.value)}
+      className="field appearance-auto"
+    >
+      {options.map((o) => (
+        <option key={String(o.value)} value={String(o.value)}>
+          {o.label}
+        </option>
+      ))}
+    </select>
   );
 }
