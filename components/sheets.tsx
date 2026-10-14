@@ -9,6 +9,26 @@ import { update, type Chore, type House } from "@/lib/store";
 
 type Props = { h: House; onClose: () => void };
 
+// Example details for each event type, so the demo needs no typing
+const EXAMPLES: Record<string, string> = {
+  Interview: "Video interview for a summer internship",
+  "Study session": "Studying for midterms",
+  "Work call": "Weekly team meeting",
+  "Early night": "Early shift tomorrow",
+  "Quiet time": "Reading night",
+  Party: "Birthday party",
+  Dinner: "Dinner with friends",
+  Breakfast: "Weekend pancakes",
+  Lunch: "Lunch with coworkers",
+  "Club meeting": "Book club",
+  "Game night": "Board game night",
+  "Overnight guest": "Friend visiting from Boston",
+  "Repair visit": "Plumber fixing the kitchen sink",
+  "House meeting": "Monthly check-in",
+  Away: "Weekend trip home",
+  Delivery: "New couch arriving",
+};
+
 const MOOD_HELP: Record<Mood, string> = {
   quiet: "You need the house quiet. Overlapping busy events get flagged.",
   busy: "Guests, noise, or the kitchen in use.",
@@ -16,7 +36,7 @@ const MOOD_HELP: Record<Mood, string> = {
 };
 
 export function AddChore({ h, onClose }: Props) {
-  const [name, setName] = useState("");
+  const [name, setName] = useState("Clean out the fridge"); // pre-filled for the demo
   const [who, setWho] = useState(h.me);
   const [often, setOften] = useState<Chore["often"]>("Weekly");
 
@@ -48,10 +68,10 @@ export function AddChore({ h, onClose }: Props) {
 }
 
 export function AddBill({ h, onClose }: Props) {
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState("45"); // pre-filled for the demo
   const [paidBy, setPaidBy] = useState(h.me);
   const [category, setCategory] = useState(CATEGORIES[0]);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState("Paper towels and dish soap");
   const value = Number(amount);
 
   return (
@@ -103,10 +123,11 @@ export function AddEvent({ h, onClose }: Props) {
   const [date, setDate] = useState(() => toYMD(new Date()));
   const [from, setFrom] = useState(EVENTS.Interview.from);
   const [to, setTo] = useState(EVENTS.Interview.to);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(EXAMPLES.Interview);
 
-  // Picking a type fills in its usual times
+  // Picking a type fills in its usual times and example details (unless you wrote your own)
   const pickKind = (k: string) => {
+    if (!note.trim() || note === EXAMPLES[kind]) setNote(EXAMPLES[k]);
     setKind(k);
     setFrom(EVENTS[k].from);
     setTo(EVENTS[k].to);
@@ -134,7 +155,7 @@ export function AddEvent({ h, onClose }: Props) {
           </div>
         </Field>
       ))}
-      <Field label="Details" help="Optional. For example, Video interview with Google.">
+      <Field label="Details" help="Optional. Shown on the calendar.">
         <input className="field" aria-label="Details" value={note} onChange={(e) => setNote(e.target.value)} />
       </Field>
       <Field label="Day">

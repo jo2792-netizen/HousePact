@@ -14,7 +14,7 @@ const SECTIONS: { title: string; icon: IconName; fields: string[][] }[] = [
 
 export default function Info() {
   const h = useHouse();
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState("Small scratch on the bedroom door"); // pre-filled for the demo
   if (!h) return null;
 
   const addNote = (e: React.FormEvent) => {

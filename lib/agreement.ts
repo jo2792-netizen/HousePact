@@ -273,7 +273,7 @@ export function defaultAnswers(n: number): Answers {
     chores: "rotation",
     owners: ZONES.map((_, z) => z % n),
     makeup: "48h",
-    rent: 0,
+    rent: 4800, // pre-filled for the demo
     split: "equal",
     percents: evenPercents(n),
     payer: 0,
@@ -311,21 +311,21 @@ export function fitAnswers(a: Answers, n: number): Answers {
 export const toYMD = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-/** Effective today; a 12-month lease starting the first of next month. */
+// Pre-filled so the demo needs no typing; everything stays editable.
+export const SAMPLE_ADDRESS = "245 Bedford Avenue, Apt 4B, Brooklyn, NY 11211";
+export const SAMPLE_NAMES = ["Maya Chen", "Jordan Rivera", "Priya Patel", "Sam Okafor", "Alex Kim", "Taylor Brooks"];
+
+/** The sample address and four roommates; effective today; a 12-month lease starting the first of next month. */
 export function blankHousehold(): Household {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const end = new Date(start.getFullYear() + 1, start.getMonth(), 0);
-  return { address: "", names: ["", "", "", ""], leaseStart: toYMD(start), leaseEnd: toYMD(end), effective: toYMD(now) };
+  return { address: SAMPLE_ADDRESS, names: SAMPLE_NAMES.slice(0, 4), leaseStart: toYMD(start), leaseEnd: toYMD(end), effective: toYMD(now) };
 }
 
 export function sampleDraft(): { household: Household; answers: Answers } {
   return {
-    household: {
-      ...blankHousehold(),
-      address: "245 Bedford Avenue, Apt 4B, Brooklyn, NY 11211",
-      names: ["Maya Chen", "Jordan Rivera", "Priya Patel", "Sam Okafor"],
-    },
+    household: blankHousehold(),
     answers: {
       ...defaultAnswers(4),
       clean: 4,

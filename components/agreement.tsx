@@ -166,7 +166,7 @@ const clean = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
 
 /** One roommate's signature: type your name to sign; it then appears in a script font with a timestamp. */
 function SignatureLine({ name, signedAt, onSign, onUnsign }: { name: string; signedAt: string | null; onSign: () => void; onUnsign: () => void }) {
-  const [typed, setTyped] = useState("");
+  const [typed, setTyped] = useState(name); // pre-filled for the demo
   const matches = clean(typed) === clean(name);
 
   return (

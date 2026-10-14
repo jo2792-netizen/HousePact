@@ -18,7 +18,7 @@ College students and young professionals sharing an apartment with 2–6 roommat
 
 ## Features (simple version of each)
 
-**Setup.** The app opens on an onboarding flow: a welcome screen with a "Load Sample Answers" button for live demos, household details (address, 2 to 6 roommate names, lease dates, effective date), eight questions, a review screen with an Edit link per section, and the generated agreement. "Open Household Dashboard" then opens Home, filled with realistic example info, chores, bills, and events. A small Reset starts onboarding over.
+**Setup.** The app opens on an onboarding flow: a welcome screen with a "Load Sample Answers" button for live demos, household details (address, 2 to 6 roommate names, lease dates, effective date), eight questions, a review screen with an Edit link per section, and the generated agreement. "Open Household Dashboard" then opens Home, filled with realistic example info, chores, bills, and events. A small Reset starts onboarding over. For demos, every text field comes pre-filled with realistic sample details (address, names, rent, signatures, and examples in the Add forms), so the whole flow works with taps alone.
 
 **Apartment Info.** WiFi (tap to copy), trash pickup days, super/HOA contacts, and emergency info (contacts, shutoff valve, breaker box).
 

@@ -6,7 +6,7 @@ import { AgreementDocument } from "@/components/agreement";
 import { Icon } from "@/components/icons";
 import { QUESTIONS } from "@/components/questions";
 import { BackButton, Field, NavBar } from "@/components/ui";
-import { blankHousehold, defaultAnswers, fitAnswers, longDate, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
+import { SAMPLE_NAMES, blankHousehold, defaultAnswers, fitAnswers, longDate, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
 import { newHouse } from "@/lib/house";
 import { canUndoReset, save, undoReset, useHouse } from "@/lib/store";
 
@@ -134,6 +134,10 @@ function Onboarding() {
     return (
       <Page left={<BackButton onClick={() => go(WELCOME)} />}>
         <StepHeader label="Before You Begin" title="Household Details" why="These details appear at the top of your agreement and in every clause that names you." />
+        <p className="flex gap-2 rounded-xl bg-surface p-4 text-subhead text-secondary">
+          <Icon name="info" className="mt-0.5 size-4 shrink-0" />
+          Filled in with sample details for the demo. Change anything you like.
+        </p>
         <Field label="Address" help="The full street address, including the apartment number.">
           <input
             className="field"
@@ -165,7 +169,7 @@ function Onboarding() {
             </div>
           ))}
           {names.length < 6 && (
-            <button className="link self-start" onClick={() => changeHousehold({ names: [...names, ""] })}>
+            <button className="link self-start" onClick={() => changeHousehold({ names: [...names, SAMPLE_NAMES.find((n) => !names.includes(n)) ?? ""] })}>
               <Icon name="plus" />
               Add Roommate
             </button>
