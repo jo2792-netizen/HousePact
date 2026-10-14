@@ -73,7 +73,7 @@ export function Sheet({ title, canSave, onSave, onClose, children }: {
   children: ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 z-20 flex items-end justify-center bg-ink/40" onClick={onClose}>
+    <div className="fixed inset-0 z-30 flex items-end justify-center bg-ink/40 md:items-center md:p-6" onClick={onClose}>
       <form
         role="dialog"
         aria-modal="true"
@@ -84,7 +84,7 @@ export function Sheet({ title, canSave, onSave, onClose, children }: {
           onSave();
           onClose();
         }}
-        className="flex max-h-[90dvh] w-full max-w-md animate-slide-up flex-col gap-5 overflow-y-auto rounded-t-2xl bg-white p-6 pb-8"
+        className="flex max-h-[90dvh] w-full max-w-md animate-slide-up flex-col gap-5 overflow-y-auto rounded-t-2xl bg-white p-6 pb-8 md:rounded-2xl"
       >
         <div className="flex items-center justify-between">
           <h2>{title}</h2>

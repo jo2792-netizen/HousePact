@@ -1,9 +1,10 @@
-import { shortName } from "./agreement";
+import { rentShares, shortName, toYMD } from "./agreement";
 import type { Bill, CalEvent, Chore, House } from "./store";
 
 export const COLORS = ["#4F7CFF", "#2BB673", "#F28C38", "#A66CFF", "#EC5FA0", "#20B2C4"];
 export const CATEGORIES = ["Groceries", "Utilities", "Repairs", "Furniture"];
 export const HOUSEPACT = "Housepact";
+export const PAYMENT = "Payment"; // money one roommate paid another to settle up
 
 // Calendar event types. "quiet" events clash with "busy" ones that overlap them.
 export type Mood = "quiet" | "busy" | "info";
@@ -52,7 +53,8 @@ export function debts(house: House) {
   const net = house.mates.map(() => 0); // above 0: is owed money, below 0: owes money
   for (const bill of allBills(house)) {
     net[bill.paidBy] += bill.amount;
-    for (let i = 0; i < net.length; i++) net[i] -= bill.amount / net.length;
+    if (bill.paidTo !== undefined) net[bill.paidTo] -= bill.amount; // a payment settles a debt
+    else for (let i = 0; i < net.length; i++) net[i] -= bill.amount / net.length;
   }
   // Settle the biggest debt with the biggest credit until everyone is even
   const list: { from: number; to: number; amount: number }[] = [];
@@ -65,6 +67,51 @@ export function debts(house: House) {
     net[from] += amount;
     net[to] -= amount;
   }
+}
+
+/** This month's shared spending (payments between roommates don't count). */
+export function spentThisMonth(house: House) {
+  const month = toYMD(new Date()).slice(0, 7);
+  return allBills(house)
+    .filter((b) => b.paidTo === undefined && toYMD(new Date(b.at)).slice(0, 7) === month)
+    .reduce((sum, b) => sum + b.amount, 0);
+}
+
+/** The next rent payment: rent is due on the 1st; shares are due a few days earlier, per the agreement. */
+export function rentStatus(house: House) {
+  const { answers } = house.agreement;
+  const now = new Date();
+  const due = new Date(now.getFullYear(), now.getMonth() + (now.getDate() === 1 ? 0 : 1), 1);
+  const payBy = new Date(due);
+  payBy.setDate(payBy.getDate() - Number(answers.due));
+  const month = toYMD(due).slice(0, 7);
+  const paid = house.rentPaid?.[month] ?? [];
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return {
+    due,
+    payBy,
+    month,
+    paid,
+    days: Math.round((due.getTime() - today.getTime()) / (24 * 60 * 60 * 1000)),
+    total: answers.rent,
+    shares: rentShares(answers, house.mates.length).map((s) => s.amount),
+    collector: answers.payer, // -1 when everyone pays the landlord directly
+  };
+}
+
+/** "Today", "Tomorrow", or a date like "Thu, Oct 15". */
+export function dayLabel(iso: string) {
+  const d = new Date(iso);
+  const now = new Date();
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  if (d.toDateString() === now.toDateString()) return "Today";
+  if (d.toDateString() === tomorrow.toDateString()) return "Tomorrow";
+  return day(iso);
+}
+
+export function greeting() {
+  const hour = new Date().getHours();
+  return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 }
 
 /** Events that haven't ended yet, soonest first. */
@@ -87,7 +134,12 @@ export function googleCalendarLink(event: CalEvent, houseName: string) {
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${utc(event.start)}/${utc(event.end)}`;
 }
 
-export const money = (n: number) => "$" + n.toFixed(2).replace(".00", "");
+/** "$1,344" for whole dollars, "$33.90" otherwise. */
+export function money(n: number) {
+  const cents = Math.round(n * 100) / 100;
+  const decimals = Number.isInteger(cents) ? 0 : 2;
+  return "$" + cents.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
 export const day = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 export const time = (iso: string) =>

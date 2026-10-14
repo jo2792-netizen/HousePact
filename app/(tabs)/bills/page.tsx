@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Choice, Dot, DotPicker, Field, Sheet } from "@/components/ui";
-import { CATEGORIES, HOUSEPACT, allBills, day, debts, money } from "@/lib/house";
-import { update, useHouse, type House } from "@/lib/store";
+import { AddButton, BillRow, Card, PageHeader, RentCard, Stat } from "@/components/cards";
+import { AddBill } from "@/components/sheets";
+import { Dot } from "@/components/ui";
+import { PAYMENT, allBills, debts, money, spentThisMonth } from "@/lib/house";
+import { update, useHouse } from "@/lib/store";
 
 export default function Bills() {
   const h = useHouse();
@@ -11,87 +13,86 @@ export default function Bills() {
   if (!h) return null;
 
   const owed = debts(h);
-  const who = (i: number, you: string) => (i === h.me ? you : <Dot i={i} name={h.mates[i]} />);
+  const iOwe = owed.filter((d) => d.from === h.me).reduce((sum, d) => sum + d.amount, 0);
+  const owedToMe = owed.filter((d) => d.to === h.me).reduce((sum, d) => sum + d.amount, 0);
+  const spent = spentThisMonth(h);
+  const name = (i: number) => (i === h.me ? "You" : h.mates[i]);
+
+  // Recording a payment settles that debt
+  const settle = (from: number, to: number, amount: number) =>
+    update({ bills: [...h.bills, { amount: Math.round(amount * 100) / 100, paidBy: from, paidTo: to, category: PAYMENT, at: new Date().toISOString() }] });
+
+  // Expenses grouped by month, newest first
+  const months = new Map<string, ReturnType<typeof allBills>>();
+  for (const b of allBills(h)) {
+    const month = new Date(b.at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    months.set(month, [...(months.get(month) ?? []), b]);
+  }
 
   return (
     <>
-      <h1>Bills</h1>
-      <section className="card flex flex-col gap-3">
-        {!owed.length && <p className="text-2xl font-bold">All settled ✓</p>}
-        {owed.map(({ from, to, amount }) => (
-          <div key={`${from}-${to}`} className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-2">
-              {who(from, "You")} {from === h.me ? "owe" : "owes"} {who(to, "you")}
-            </span>
-            <span className={`text-3xl font-bold ${from === h.me ? "text-alert" : ""}`}>{money(amount)}</span>
-          </div>
-        ))}
-      </section>
+      <PageHeader
+        title="Bills"
+        subtitle={`Shared costs are split equally ${h.mates.length} ways and tracked here.`}
+        action={<AddButton label="Add bill" onClick={() => setAdding(true)} />}
+      />
 
-      <ul className="divide-y divide-line rounded-xl bg-white px-4">
-        {allBills(h).map((b, i) => (
-          <li key={i} className="flex items-center gap-3 py-3">
-            <div className="min-w-0 flex-1">
-              <p>{b.note || b.category}</p>
-              <p className="text-sm text-muted">
-                {b.category === HOUSEPACT ? "Monthly" : b.category} · {day(b.at)}
-              </p>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+        <Stat label="Spent this month" value={money(spent)} sub="Shared costs, not rent" />
+        <Stat label="Your share this month" value={money(spent / h.mates.length)} sub={`One of ${h.mates.length} equal shares`} />
+        {iOwe ? (
+          <Stat label="You owe" value={money(iOwe)} sub="See balances below" alert />
+        ) : (
+          <Stat label={owedToMe ? "You're owed" : "Your balance"} value={owedToMe ? money(owedToMe) : "Settled"} sub={owedToMe ? "From your roommates" : "Nobody owes you"} />
+        )}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-5">
+        <div className="flex flex-col gap-6 lg:col-span-2">
+          <Card title="Balances" icon="users">
+            {owed.length ? (
+              <ul className="divide-y divide-line">
+                {owed.map(({ from, to, amount }) => (
+                  <li key={`${from}-${to}`} className="flex flex-col gap-2 py-3">
+                    <div className="flex items-center gap-2">
+                      <Dot i={from} name={h.mates[from]} />
+                      <p className="min-w-0 flex-1">
+                        <span className="font-semibold">{name(from)}</span> {from === h.me ? "owe" : "owes"}{" "}
+                        <span className="font-semibold">{to === h.me ? "you" : name(to)}</span>
+                      </p>
+                      <span className={`text-xl font-bold tabular-nums ${from === h.me ? "text-alert" : ""}`}>{money(amount)}</span>
+                    </div>
+                    <button onClick={() => settle(from, to, amount)} className="self-end rounded-full border border-line px-4 py-2 text-sm font-semibold hover:border-ink">
+                      Mark paid
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted">Everyone is settled up.</p>
+            )}
+          </Card>
+          <RentCard h={h} />
+        </div>
+
+        <Card title="Expenses" icon="bills" className="lg:col-span-3">
+          {[...months].map(([month, bills]) => (
+            <div key={month} className="mt-2 first:mt-0">
+              <h3 className="flex justify-between border-b border-line pb-2 text-sm font-semibold text-muted">
+                <span>{month}</span>
+                <span>{money(bills.filter((b) => b.paidTo === undefined).reduce((sum, b) => sum + b.amount, 0))}</span>
+              </h3>
+              <ul className="divide-y divide-line">
+                {bills.map((b, i) => (
+                  <BillRow key={i} h={h} b={b} />
+                ))}
+              </ul>
             </div>
-            <Dot i={b.paidBy} name={h.mates[b.paidBy]} />
-            <span className="w-20 text-right font-semibold">{money(b.amount)}</span>
-          </li>
-        ))}
-      </ul>
-      <button className="btn" onClick={() => setAdding(true)}>
-        Add bill
-      </button>
+          ))}
+        </Card>
+      </div>
+
       {adding && <AddBill h={h} onClose={() => setAdding(false)} />}
     </>
-  );
-}
-
-function AddBill({ h, onClose }: { h: House; onClose: () => void }) {
-  const [amount, setAmount] = useState("");
-  const [paidBy, setPaidBy] = useState(h.me);
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [note, setNote] = useState("");
-  const value = Number(amount);
-
-  return (
-    <Sheet
-      title="Add bill"
-      canSave={value > 0}
-      onSave={() =>
-        update({ bills: [...h.bills, { amount: value, paidBy, category, note: note.trim(), at: new Date().toISOString() }] })
-      }
-      onClose={onClose}
-    >
-      <label className="field flex h-16 items-center gap-1 text-3xl font-bold">
-        $
-        <input
-          autoFocus
-          inputMode="decimal"
-          placeholder="0"
-          aria-label="Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))}
-          className="min-w-0 flex-1 outline-none"
-        />
-      </label>
-      {value > 0 && <p className="-mt-3 text-sm text-muted">{money(value / h.mates.length)} each</p>}
-      <input className="field" placeholder="What for? (optional)" aria-label="What for" value={note} onChange={(e) => setNote(e.target.value)} />
-      <Field label="Paid by">
-        <DotPicker mates={h.mates} value={paidBy} onChange={setPaidBy} />
-      </Field>
-      <Field label="Category">
-        <div className="grid grid-cols-2 gap-2">
-          {CATEGORIES.map((c) => (
-            <Choice key={c} on={category === c} onClick={() => setCategory(c)}>
-              {c}
-            </Choice>
-          ))}
-        </div>
-      </Field>
-    </Sheet>
   );
 }

@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 import type { Answers, Household } from "./agreement";
 
 export type Chore = { name: string; who: number; often: "Daily" | "Weekly"; doneBy?: number; doneAt?: string };
-export type Bill = { amount: number; paidBy: number; category: string; at: string; note?: string };
+export type Bill = { amount: number; paidBy: number; category: string; at: string; note?: string; paidTo?: number }; // paidTo: a payment between roommates
 export type CalEvent = { kind: string; start: string; end: string; by: number; note?: string };
 
 export type House = {
@@ -18,6 +18,8 @@ export type House = {
   chores: Chore[];
   bills: Bill[];
   events: CalEvent[];
+  photo?: string; // the apartment photo, as an image data URL
+  rentPaid?: Record<string, number[]>; // roommates who paid their rent share, by month ("2026-11")
 };
 
 const KEY = "housepact-v4"; // change when the data shape changes, so old saves are ignored
@@ -38,8 +40,12 @@ function read() {
 
 export function save(house: House | null) {
   current = house;
-  if (house) localStorage.setItem(KEY, JSON.stringify(house));
-  else localStorage.removeItem(KEY);
+  try {
+    if (house) localStorage.setItem(KEY, JSON.stringify(house));
+    else localStorage.removeItem(KEY);
+  } catch {
+    // Storage is full (e.g. a very large photo); keep working in memory
+  }
   listeners.forEach((listener) => listener());
 }
 
