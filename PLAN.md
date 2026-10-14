@@ -10,8 +10,7 @@ Build everything below in one pass, keeping each feature as simple as possible. 
 - [x] Agreement: formal document generated from the answers, type-to-sign, Fully Executed status, Download as PDF
 - [x] Chores: add, assign, set frequency, check off (logs who and when)
 - [x] Bills: add expense, split equally, show who owes whom, Housepact subscription included
-- [x] Condition: before photos, notes by room with photos, report a repair from a note
-- [x] Repairs: status, landlord or roommates, group or individual cost sent to Bills
+- [x] Condition tab (6th tab): before photos, repairs with status, landlord or roommates, and group or individual cost sent to Bills, then notes by room
 - [x] Calendar: many event types (Needs quiet / Busy house / Heads-up), clash warning, Home heads-up, "Add to Google Calendar" link
 - [x] Realistic example data on the new house, so every tab has something to show
 

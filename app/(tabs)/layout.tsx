@@ -15,12 +15,10 @@ const SECTIONS: [string, string, IconName][] = [
   ["/bills", "Bills", "bills"],
   ["/calendar", "Calendar", "calendar"],
   ["/condition", "Condition", "camera"],
-  ["/repairs", "Repairs", "wrench"],
   ["/info", "Apartment Info", "info"],
 ];
-// Phones get five tabs (the HIG limit); the rest sit under More
-const TABS: [string, string, IconName][] = [...SECTIONS.slice(0, 4), ["/more", "More", "more"]];
-const UNDER_MORE = ["/more", "/calendar", "/condition", "/repairs", "/info"];
+// Phones get six tabs, everything but Apartment Info (that one is reachable from Home's House Info card)
+const TABS = SECTIONS.slice(0, 6);
 
 // Wraps every screen except Setup: sends first-time visitors to Setup. Phones get a top
 // navigation bar and a bottom tab bar; larger screens get a sidebar.
@@ -34,7 +32,7 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
   }, [house, router]);
 
   const isActive = (href: string) =>
-    href === "/" ? path === "/" : href === "/more" ? UNDER_MORE.some((p) => path.startsWith(p)) : path.startsWith(href);
+    href === "/" ? path === "/" || (path === "/info" && href === "/") : path.startsWith(href);
 
   return (
     <>

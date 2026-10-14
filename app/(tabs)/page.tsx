@@ -242,7 +242,7 @@ export default function Home() {
             )}
           </Card>
 
-          <Card title="Open Repairs" icon="wrench" action={<SeeAll href="/repairs" />}>
+          <Card title="Open Repairs" icon="wrench" action={<SeeAll href="/condition#repairs" />}>
             {openRepairs.length ? (
               <ul className="divide-y divide-separator">
                 {openRepairs.map((r) => (

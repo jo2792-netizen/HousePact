@@ -44,14 +44,13 @@ Follows `apple-hig-quick-guide.md` (the source of truth): clarity, deference, de
 - **Signature moment.** The agreement appears as a formal paper document (serif type, numbered articles, ruled tables) signed by typing your name, shown in a script font, ending in "Fully Executed." It adapts to Dark Mode on screen and always prints black on white. No emojis anywhere in the app.
 
 ## Layout
-Responsive. Phones get a single column with a bottom tab bar of five tabs, the HIG limit (icon + label): **Home · Agreement · Chores · Bills · More**. More lists Calendar, Condition, Repairs, and Apartment Info. Tablets and laptops get a left sidebar with the logo, house name, every section, and Reset Demo.
+Responsive. Phones get a single column with a bottom tab bar of six tabs (icon + label): **Home · Agreement · Chores · Bills · Calendar · Condition**. Apartment Info opens from Home's House Info card. (Apple suggests five tabs at most on iPhone; we chose six so Condition is always one tap away.) Tablets and laptops get a left sidebar with the logo, house name, every section, and Reset Demo.
 
 - **Home (the overview):** greeting for you (the app is from one roommate's point of view); a cover picture of the apartment (a drawn brownstone by default, or an uploaded photo) with the address, lease dates, and Add bill / Add chore / Add event; a heads-up when someone needs quiet; four summary tiles (rent share, balance, your chores, agreement); then cards for this month's rent (who has paid), your roommates and their invite status (with Resend), upcoming chores (check off in place), recent bills, what's coming up, house info, and key house rules from the agreement.
 - **Tabs go deeper:** each starts with a title, one-line description, an Add button, and summary tiles.
 - **Chores:** Your chores, housemates' chores, and done, each with a round checkbox.
 - **Bills:** Monthly totals, balances with "Mark paid" to record a payment, the rent card, and expenses grouped by month. "Add bill" opens one sheet: amount, what for, paid by, category, Save.
-- **Condition:** Before Photos from move-in, then notes by room with photos, Add Photo, and Report Repair. Photos open full size.
-- **Repairs:** Needs Attention and Fixed sections. Each repair shows its status (icon + label), one button for the next status, and who pays; costs link to Bills.
+- **Condition:** Before Photos first, then Repairs (Needs Attention and Fixed), then notes by room (with photos that open full size, Add Photo, and Report Repair). In Repairs, each repair shows its status (icon + label), one button for the next status, and who pays; costs link to Bills.
 - **Calendar:** Upcoming events grouped by Today, Tomorrow, and date. Event types are chips (Interview, Party, Dinner…) grouped as Needs quiet / Busy house / Heads-up, with a red warning on conflicts.
 - **Cards:** surface color, 16pt rounded, no border, no shadow. One consistent set of line icons; never emojis.
 - **Agreement onboarding:** One topic per screen with "Step X of 8," a one-line reason it matters, and option cards with helper text and a "Recommended" tag. Back keeps answers.
