@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { DotPicker } from "@/components/ui";
-import { debts, isDone, money, upcoming, when } from "@/lib/house";
+import { EMOJI, debts, isDone, money, upcoming, when } from "@/lib/house";
 import { reset, update, useHouse } from "@/lib/store";
 
 export default function Home() {
@@ -25,8 +25,9 @@ export default function Home() {
 
   return (
     <>
+      <p className="-mb-4 text-muted">Hi, {h.mates[h.me]} 👋</p>
       <h1>{h.name}</h1>
-      {/* Tap a dot to switch who "you" are */}
+      {/* Tap a dot to switch whose dashboard this is */}
       <DotPicker mates={h.mates} value={h.me} onChange={(me) => update({ me })} />
 
       <div className="divide-y divide-line rounded-xl bg-white px-4">
@@ -42,13 +43,18 @@ export default function Home() {
           <Row label="WiFi" value="Add" href="/info" />
         )}
         <Row label="Trash" value={h.info.trash || "Add"} href="/info" />
+        <Row
+          label="Pact"
+          value={h.agreed.length === h.mates.length ? "Signed ✓" : `${h.agreed.length}/${h.mates.length} agreed`}
+          href="/pact"
+        />
         <Row label="Your chores" value={myChores || "Done ✓"} href="/chores" />
         {iOwe ? (
           <Row label="You owe" value={money(iOwe)} href="/bills" alert />
         ) : (
           <Row label={owedToMe ? "You're owed" : "Bills"} value={owedToMe ? money(owedToMe) : "All settled"} href="/bills" />
         )}
-        <Row label="Next" value={next ? `${next.kind === "Quiet" ? "🤫" : "🎉"} ${when(next.start)}` : "Nothing"} href="/calendar" />
+        <Row label="Next" value={next ? `${EMOJI[next.kind]} ${when(next.start)}` : "Nothing"} href="/calendar" />
         <Row label="Apartment info" value="›" href="/info" />
       </div>
 

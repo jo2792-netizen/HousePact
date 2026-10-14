@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  devIndicators: false, // hide the Next.js badge so it doesn't show during class demos
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

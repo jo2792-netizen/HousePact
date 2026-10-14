@@ -2,8 +2,8 @@
 import { useSyncExternalStore } from "react";
 
 export type Chore = { name: string; who: number; often: "Daily" | "Weekly"; doneBy?: number; doneAt?: string };
-export type Bill = { amount: number; paidBy: number; category: string; at: string };
-export type CalEvent = { kind: "Quiet" | "Hosting"; start: string; end: string; by: number };
+export type Bill = { amount: number; paidBy: number; category: string; at: string; note?: string };
+export type CalEvent = { kind: "Quiet" | "Hosting"; start: string; end: string; by: number; note?: string };
 
 export type House = {
   name: string;
@@ -12,14 +12,14 @@ export type House = {
   since: string; // setup date, starts the monthly Housepact bill
   info: Record<string, string>; // WiFi, trash days, contacts, emergency info
   notes: { text: string; at: string }[]; // condition tracker
-  answers: number[] | null; // pact quiz answers, null until the quiz is done
+  answers: number[]; // pact quiz answers
   agreed: number[]; // roommates who agreed to the pact
   chores: Chore[];
   bills: Bill[];
   events: CalEvent[];
 };
 
-const KEY = "housepact";
+const KEY = "housepact-v2"; // change when the data shape changes, so old saves are ignored
 const listeners = new Set<() => void>();
 let current: House | null | undefined; // undefined = not read yet
 let beforeReset: House | null = null;

@@ -18,7 +18,7 @@ College students and young professionals sharing an apartment with 2–6 roommat
 
 ## Features (simple version of each)
 
-**Setup.** The app opens on a Setup screen: enter the household name and roommate names, or tap "Load demo house."
+**Setup.** The app opens on a short onboarding for the main tenant: a welcome screen, their name and place, quickly adding roommates (type a name or tap a suggestion), and the pact quiz. It then opens on Home, filled with realistic example info, chores, bills, and events to explore. A small Reset starts onboarding over.
 
 **Apartment Info.** WiFi (tap to copy), trash pickup days, super/HOA contacts, and emergency info (contacts, shutoff valve, breaker box).
 

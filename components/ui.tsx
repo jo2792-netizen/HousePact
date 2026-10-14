@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { COLORS } from "@/lib/house";
+import { COLORS, pactRules } from "@/lib/house";
 
 /** A roommate's color dot with their initial. Hollow = not filled in (e.g. hasn't agreed yet). */
 export function Dot({ i, name, big, hollow }: { i: number; name: string; big?: boolean; hollow?: boolean }) {
@@ -47,6 +47,50 @@ export function Choice({ on, onClick, children }: { on: boolean; onClick: () => 
     >
       {children}
     </button>
+  );
+}
+
+/** The house agreement as a sticky note. Everyone taps their dot to agree; it gets a ✓ when all have. */
+export function PactNote({ title, mates, answers, agreed, onToggle }: {
+  title: string;
+  mates: string[];
+  answers: number[];
+  agreed: number[];
+  onToggle: (i: number) => void;
+}) {
+  const everyone = agreed.length === mates.length;
+  return (
+    <div className="flex -rotate-1 flex-col gap-4 rounded-xl bg-note p-6">
+      <div className="flex items-start justify-between gap-3">
+        <h2>{title} pact</h2>
+        {everyone && (
+          <span role="img" aria-label="Everyone agreed" className="text-4xl leading-none">
+            ✓
+          </span>
+        )}
+      </div>
+      <ol className="flex list-decimal flex-col gap-2 pl-5">
+        {pactRules(answers).map((rule) => (
+          <li key={rule}>{rule}</li>
+        ))}
+      </ol>
+      <div className="flex flex-wrap gap-2 pt-2">
+        {mates.map((name, i) => {
+          const on = agreed.includes(i);
+          return (
+            <button key={i} aria-label={name} aria-pressed={on} onClick={() => onToggle(i)} className="relative rounded-full">
+              <Dot i={i} name={name} big hollow={!on} />
+              {on && (
+                <span className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full bg-ink text-sm text-white">
+                  ✓
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <p>{everyone ? "Everyone agreed" : "Tap your dot to agree"}</p>
+    </div>
   );
 }
 

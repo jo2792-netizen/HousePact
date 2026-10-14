@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { Choice, Dot, Field, Sheet } from "@/components/ui";
-import { clashes, day, googleCalendarLink, time, upcoming } from "@/lib/house";
+import { EMOJI, clashes, day, googleCalendarLink, time, upcoming } from "@/lib/house";
 import { update, useHouse, type CalEvent, type House } from "@/lib/store";
 
-const EMOJI = { Quiet: "🤫", Hosting: "🎉" };
 const DEFAULT_TIMES = { Quiet: ["23:00", "07:00"], Hosting: ["20:00", "23:00"] };
 
 export default function Calendar() {
@@ -21,7 +20,7 @@ export default function Calendar() {
       {!events.length && <p className="text-muted">Nothing planned</p>}
       <ul className="flex flex-col gap-3">
         {events.map((e, i) => {
-          const clash = clashes(e, h.events);
+          const clash = clashes(e, events);
           return (
             <li key={i} className={`card flex flex-col gap-1 border-2 ${clash ? "border-alert" : "border-transparent"}`}>
               <div className="flex items-center justify-between gap-3">
@@ -30,6 +29,7 @@ export default function Calendar() {
                 </p>
                 <Dot i={e.by} name={h.mates[e.by]} />
               </div>
+              {e.note && <p>{e.note}</p>}
               <p className="text-muted">
                 {day(e.start)} · {time(e.start)}–{time(e.end)}
               </p>
@@ -54,6 +54,7 @@ function AddEvent({ h, onClose }: { h: House; onClose: () => void }) {
   const [date, setDate] = useState(today);
   const [from, setFrom] = useState(DEFAULT_TIMES.Quiet[0]);
   const [to, setTo] = useState(DEFAULT_TIMES.Quiet[1]);
+  const [note, setNote] = useState("");
 
   const pickKind = (k: CalEvent["kind"]) => {
     setKind(k);
@@ -65,7 +66,7 @@ function AddEvent({ h, onClose }: { h: House; onClose: () => void }) {
     const start = new Date(`${date}T${from}`);
     const end = new Date(`${date}T${to}`);
     if (end <= start) end.setDate(end.getDate() + 1); // ends after midnight
-    update({ events: [...h.events, { kind, start: start.toISOString(), end: end.toISOString(), by: h.me }] });
+    update({ events: [...h.events, { kind, start: start.toISOString(), end: end.toISOString(), by: h.me, note: note.trim() }] });
   };
 
   return (
@@ -77,6 +78,7 @@ function AddEvent({ h, onClose }: { h: House; onClose: () => void }) {
           </Choice>
         ))}
       </div>
+      <input className="field" placeholder="What's happening? (optional)" aria-label="What's happening" value={note} onChange={(e) => setNote(e.target.value)} />
       <Field label="Day">
         <input type="date" aria-label="Day" className="field" value={date} onChange={(e) => setDate(e.target.value)} />
       </Field>
