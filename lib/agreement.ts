@@ -450,7 +450,7 @@ export function summary(h: Household, a: Answers) {
       ],
     },
     {
-      title: "Rent, utilities, and groceries",
+      title: "Rent, Utilities, and Groceries",
       lines: [
         `${dollars(a.rent)} per month, ${a.split === "equal" ? "split equally" : "custom split"}`,
         h.names.map((name, i) => `${name} ${dollars(shares[i].amount)}`).join(", "),
@@ -461,7 +461,7 @@ export function summary(h: Household, a: Answers) {
       ],
     },
     {
-      title: "Food and belongings",
+      title: "Food and Belongings",
       lines: [
         `Food: ${label(BORROWING, a.borrowing)}`,
         `Personal items in common areas: up to ${label(ITEMS, a.items).toLowerCase()}`,
@@ -476,7 +476,7 @@ export function summary(h: Household, a: Answers) {
         `Parties: ${label(PARTIES, a.parties)}`,
       ],
     },
-    { title: "Quiet hours", lines: [quiet, a.headphones ? "Headphones for media during quiet hours" : "Low volume during quiet hours"] },
+    { title: "Quiet Hours", lines: [quiet, a.headphones ? "Headphones for media during quiet hours" : "Low volume during quiet hours"] },
     {
       title: "Damage",
       lines: [
@@ -487,7 +487,7 @@ export function summary(h: Household, a: Answers) {
       ],
     },
     {
-      title: "Sublets, move-out, and disagreements",
+      title: "Sublets, Move-Out, and Disagreements",
       lines: [
         `Subletting: ${label(SUBLET, a.sublet)}`,
         `Move-out notice: ${label(NOTICE, a.notice)}`,

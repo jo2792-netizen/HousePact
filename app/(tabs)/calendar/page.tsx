@@ -25,10 +25,10 @@ export default function Calendar() {
       <PageHeader
         title="Calendar"
         subtitle="Plans that affect the house. Anything that needs quiet is flagged if it overlaps a busy event."
-        action={<AddButton label="Add event" onClick={() => setAdding(true)} />}
+        action={<AddButton label="Add Event" onClick={() => setAdding(true)} />}
       />
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-4">
         <Stat label="Needs quiet" value={String(quiet)} sub="Interviews, studying, sleep" />
         <Stat label="Busy house" value={String(busy)} sub="Guests, meals, parties" />
         <Stat label="Conflicts" value={String(clashes)} sub={clashes ? "Check the red warnings" : "No overlaps"} alert={clashes > 0} />
@@ -38,7 +38,7 @@ export default function Calendar() {
         <div className="flex flex-col gap-6">
           {[...days].map(([label, list]) => (
             <Card key={label} title={label} icon="calendar">
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-separator">
                 {list.map((e, i) => (
                   <EventRow key={i} h={h} e={e} events={events} />
                 ))}
@@ -47,7 +47,7 @@ export default function Calendar() {
           ))}
         </div>
       ) : (
-        <p className="text-muted">Nothing planned.</p>
+        <p className="text-secondary">Nothing planned.</p>
       )}
 
       {adding && <AddEvent h={h} onClose={() => setAdding(false)} />}

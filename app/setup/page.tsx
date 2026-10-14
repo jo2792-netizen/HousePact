@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { AgreementDocument, Logo } from "@/components/agreement";
+import { AgreementDocument } from "@/components/agreement";
+import { Icon } from "@/components/icons";
 import { QUESTIONS } from "@/components/questions";
-import { Dot, Field } from "@/components/ui";
-import { blankHousehold, defaultAnswers, fitAnswers, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
+import { BackButton, Field, NavBar } from "@/components/ui";
+import { blankHousehold, defaultAnswers, fitAnswers, longDate, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
 import { newHouse } from "@/lib/house";
 import { canUndoReset, save, undoReset, useHouse } from "@/lib/store";
 
@@ -71,45 +72,46 @@ function Onboarding() {
     go(WELCOME);
   };
   const next = (from: number) => go(fromReview || from === QUESTIONS.length ? REVIEW : from + 1);
-  const nextLabel = (from: number) => (fromReview ? "Save and Review" : from === QUESTIONS.length ? "Review Answers" : "Next");
+  // Name the destination: "Continue to Guests", not "Next"
+  const nextLabel = (from: number) =>
+    fromReview ? "Save and Return to Review" : from === QUESTIONS.length ? "Continue to Review" : `Continue to ${QUESTIONS[from].short}`;
 
   if (screen === WELCOME) {
     return (
       <Page>
-        <div className="mt-6 flex items-center gap-2 font-heading text-lg font-semibold">
-          <Logo />
-          Housepact
-        </div>
-        <div>
-          <h1 className="text-4xl">Your roommate agreement, made together.</h1>
-          <p className="mt-3 text-muted">No awkward conversations, just agree once.</p>
+        <div className="flex flex-col gap-2 pt-4">
+          <h1>Your Roommate Agreement, Made Together</h1>
+          <p className="text-secondary">No awkward conversations, just agree once.</p>
         </div>
         <ol className="flex flex-col gap-4">
           {[
-            ["Household details", "The address, everyone's names, and the lease dates."],
-            ["Eight quick questions", "Cleanliness, chores, money, guests, quiet hours, and more."],
-            ["Review and sign", "Housepact writes a formal agreement that everyone signs."],
+            ["Household Details", "The address, everyone's names, and the lease dates."],
+            ["Eight Quick Questions", "Cleanliness, chores, money, guests, quiet hours, and more."],
+            ["Review and Sign", "Housepact writes a formal agreement that everyone signs."],
           ].map(([title, help], i) => (
             <li key={title} className="flex gap-4">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ink font-semibold text-white">{i + 1}</span>
+              <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-full bg-fill font-semibold text-secondary">
+                {i + 1}
+              </span>
               <span>
                 <span className="block font-semibold">{title}</span>
-                <span className="text-sm text-muted">{help}</span>
+                <span className="text-subhead text-secondary">{help}</span>
               </span>
             </li>
           ))}
         </ol>
-        <p className="text-sm text-muted">About ten minutes, together. Every question starts on a recommended answer.</p>
-        <div className="mt-auto flex flex-col gap-3">
+        <p className="text-subhead text-secondary">Takes about ten minutes together. Every question starts on a recommended answer.</p>
+        <div className="mt-auto flex flex-col gap-2">
           <button className="btn" onClick={() => go(HOUSEHOLD)}>
             Get Started
           </button>
-          <button className="btn border border-line bg-white text-ink" onClick={loadSample}>
+          <button className="btn-secondary" onClick={loadSample}>
             Load Sample Answers
           </button>
+          <p className="text-center text-subhead text-secondary">Fills in a sample household and jumps to Review.</p>
           {canUndoReset() && (
-            <button className="self-center px-4 py-2 text-sm text-muted" onClick={undoReset}>
-              Undo reset
+            <button className="link self-center" onClick={undoReset}>
+              Undo Reset
             </button>
           )}
         </div>
@@ -119,23 +121,23 @@ function Onboarding() {
 
   if (screen === HOUSEHOLD) {
     const problem = !household.address.trim()
-      ? "Enter the address of the home."
+      ? "The address is missing. Enter the home's street address to continue."
       : names.some((n) => !n.trim())
-        ? "Enter every roommate's full name."
+        ? "A roommate's name is blank. Enter each person's full name, or remove the empty row."
         : new Set(names.map((n) => n.trim().toLowerCase())).size < names.length
-          ? "Each roommate needs a different name."
+          ? "Two roommates have the same name. Give each person a different name, such as adding a last initial."
           : !(household.leaseStart && household.leaseEnd && household.effective)
-            ? "Fill in all three dates."
+            ? "A date is missing. Choose the lease start, lease end, and effective dates."
             : household.leaseEnd <= household.leaseStart
-              ? "The lease must end after it starts."
+              ? `The lease ends before it starts. Choose an end date after ${longDate(household.leaseStart)}.`
               : null;
     return (
-      <Page>
-        <StepHeader label="Before you begin" title="Household details" why="These details appear at the top of your agreement and in every clause that names you." />
-        <Field label="Address of the home">
+      <Page left={<BackButton onClick={() => go(WELCOME)} />}>
+        <StepHeader label="Before You Begin" title="Household Details" why="These details appear at the top of your agreement and in every clause that names you." />
+        <Field label="Address" help="The full street address, including the apartment number.">
           <input
             className="field"
-            aria-label="Address of the home"
+            aria-label="Address"
             placeholder="245 Bedford Avenue, Apt 4B, Brooklyn, NY 11211"
             value={household.address}
             onChange={(e) => changeHousehold({ address: e.target.value })}
@@ -143,8 +145,7 @@ function Onboarding() {
         </Field>
         <Field label="Roommates" help="Full names, as they should appear on the agreement. Two to six people.">
           {names.map((name, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <Dot i={i} name={name} />
+            <div key={i} className="flex items-center gap-2">
               <input
                 className="field"
                 aria-label={`Roommate ${i + 1}`}
@@ -154,31 +155,32 @@ function Onboarding() {
               />
               {names.length > 2 && (
                 <button
-                  aria-label={`Remove roommate ${i + 1}`}
-                  className="-mr-2 size-12 shrink-0 text-muted"
+                  aria-label={`Remove roommate ${i + 1}${name ? `, ${name}` : ""}`}
+                  className="flex size-11 shrink-0 items-center justify-center rounded-xl text-secondary hover:bg-fill"
                   onClick={() => changeHousehold({ names: names.filter((_, j) => j !== i) })}
                 >
-                  ✕
+                  <Icon name="xmark" />
                 </button>
               )}
             </div>
           ))}
           {names.length < 6 && (
-            <button className="self-start py-2 font-semibold" onClick={() => changeHousehold({ names: [...names, ""] })}>
-              + Add roommate
+            <button className="link self-start" onClick={() => changeHousehold({ names: [...names, ""] })}>
+              <Icon name="plus" />
+              Add Roommate
             </button>
           )}
         </Field>
-        <Field label="Lease dates" help="From the lease with your landlord.">
-          <div className="flex gap-3">
+        <Field label="Lease Dates" help="From the lease with your landlord.">
+          <div className="flex gap-4">
             <DateInput label="Starts" value={household.leaseStart} onChange={(leaseStart) => changeHousehold({ leaseStart })} />
             <DateInput label="Ends" value={household.leaseEnd} onChange={(leaseEnd) => changeHousehold({ leaseEnd })} />
           </div>
         </Field>
-        <Field label="Agreement effective date" help="Usually today.">
+        <Field label="Effective Date" help="When the agreement takes effect. Usually today.">
           <DateInput label="Effective" value={household.effective} onChange={(effective) => changeHousehold({ effective })} />
         </Field>
-        <Nav back={() => go(WELCOME)} next={() => next(HOUSEHOLD)} nextLabel={fromReview ? "Save and Review" : "Next"} problem={problem} />
+        <Continue onClick={() => next(HOUSEHOLD)} label={fromReview ? "Save and Return to Review" : `Continue to ${QUESTIONS[0].short}`} problem={problem} />
       </Page>
     );
   }
@@ -186,40 +188,40 @@ function Onboarding() {
   if (screen <= QUESTIONS.length) {
     const q = QUESTIONS[screen - 1];
     return (
-      <Page>
+      <Page left={<BackButton onClick={() => go(screen - 1)} />} right={<span className="text-subhead text-secondary">{screen} of {QUESTIONS.length}</span>}>
         <StepHeader label={`Step ${screen} of ${QUESTIONS.length}`} progress={screen / QUESTIONS.length} title={q.title} why={q.why} />
         <q.Body a={answers} set={changeAnswers} names={names} />
-        <Nav back={() => go(screen - 1)} next={() => next(screen)} nextLabel={nextLabel(screen)} problem={q.problem?.(answers) ?? null} />
+        <Continue onClick={() => next(screen)} label={nextLabel(screen)} problem={q.problem?.(answers) ?? null} />
       </Page>
     );
   }
 
   if (screen === REVIEW) {
     return (
-      <Page>
-        <StepHeader label="Review" title="Review your answers" why="Check everything once. Your agreement is written from these answers." />
+      <Page left={<BackButton onClick={() => go(QUESTIONS.length)} />}>
+        <StepHeader label="Almost Done" title="Review Your Answers" why="Check everything once. Your agreement is written from these answers." />
         {summary(household, answers).map((s, i) => (
           <section key={s.title} className="card flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg">{s.title}</h2>
-              <button className="px-2 py-2 font-semibold underline" onClick={() => edit(i)} aria-label={`Edit ${s.title}`}>
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-body font-semibold">{s.title}</h2>
+              <button className="link" onClick={() => edit(i)} aria-label={`Edit ${s.title}`}>
+                <Icon name="pencil" className="size-4" />
                 Edit
               </button>
             </div>
-            <ul className="flex flex-col gap-1 text-[15px]">
+            <ul className="flex flex-col gap-1 text-subhead text-secondary">
               {s.lines.map((line) => (
                 <li key={line}>{line}</li>
               ))}
             </ul>
           </section>
         ))}
-        <Nav
-          back={() => go(QUESTIONS.length)}
-          next={() => {
+        <Continue
+          onClick={() => {
             setFromReview(false);
             go(AGREEMENT);
           }}
-          nextLabel="Generate Agreement"
+          label="Generate Agreement"
           problem={null}
         />
       </Page>
@@ -229,78 +231,84 @@ function Onboarding() {
   // The agreement
   const sign = (i: number, at: string | null) => setSignatures(names.map((_, j) => (j === i ? at : signatures[j] ?? null)));
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6 print:max-w-none print:p-0">
-      <div className="flex flex-wrap gap-2 print:hidden">
-        <button className="btn h-12 w-auto border border-line bg-white text-ink" onClick={() => go(REVIEW)}>
-          Edit Answers
-        </button>
-        <button className="btn h-12 w-auto border border-line bg-white text-ink" onClick={() => window.print()}>
-          Download as PDF
-        </button>
-        <button className="btn h-12 w-auto border border-line bg-white text-ink" onClick={startOver}>
-          Start Over
-        </button>
-      </div>
-      <AgreementDocument
-        household={household}
-        answers={answers}
-        signatures={signatures}
-        onSign={(i) => sign(i, new Date().toISOString())}
-        onUnsign={(i) => sign(i, null)}
-      />
-      <div className="flex flex-col gap-2 print:hidden">
-        <button
-          className="btn"
-          onClick={() => save(newHouse({ household, answers, signatures: names.map((_, j) => signatures[j] ?? null) }))}
-        >
-          Open Household Dashboard
-        </button>
-        <p className="text-center text-sm text-muted">Anyone who hasn&apos;t signed can sign later from the dashboard.</p>
-      </div>
-    </main>
+    <>
+      <NavBar left={<BackButton onClick={() => go(REVIEW)} label="Edit Answers" />} />
+      <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pt-6 pb-[max(2rem,env(safe-area-inset-bottom))] print:max-w-none print:p-0">
+        <div className="flex flex-wrap gap-2 print:hidden">
+          <button className="btn-secondary w-auto" onClick={() => window.print()}>
+            <Icon name="download" />
+            Download as PDF
+          </button>
+          <button className="btn-secondary w-auto" onClick={startOver}>
+            <Icon name="reset" />
+            Start Over
+          </button>
+        </div>
+        <AgreementDocument
+          household={household}
+          answers={answers}
+          signatures={signatures}
+          onSign={(i) => sign(i, new Date().toISOString())}
+          onUnsign={(i) => sign(i, null)}
+        />
+        <div className="flex flex-col gap-2 print:hidden">
+          <button className="btn" onClick={() => save(newHouse({ household, answers, signatures: names.map((_, j) => signatures[j] ?? null) }))}>
+            Open Household Dashboard
+          </button>
+          <p className="text-center text-subhead text-secondary">Anyone who hasn&apos;t signed can sign later from the dashboard.</p>
+        </div>
+      </main>
+    </>
   );
 }
 
-function Page({ children }: { children: ReactNode }) {
-  return <main className="mx-auto flex min-h-dvh max-w-xl flex-col gap-6 px-4 py-8">{children}</main>;
+/** An onboarding screen: navigation bar with the logo, then content in one column. */
+function Page({ children, left, right }: { children: ReactNode; left?: ReactNode; right?: ReactNode }) {
+  return (
+    <>
+      <NavBar left={left} right={right} />
+      <main className="mx-auto flex min-h-[calc(100dvh-3rem)] max-w-xl flex-col gap-6 px-4 pt-6 pb-[max(2rem,env(safe-area-inset-bottom))]">{children}</main>
+    </>
+  );
 }
 
 function StepHeader({ label, title, why, progress }: { label: string; title: string; why: string; progress?: number }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm font-semibold text-muted">{label}</p>
+      <p className="text-subhead font-semibold text-secondary">{label}</p>
       {progress !== undefined && (
-        <div className="h-2 rounded-full bg-line">
-          <div className="h-2 rounded-full bg-ink transition-all" style={{ width: `${progress * 100}%` }} />
+        <div className="h-1 rounded-full bg-fill" role="progressbar" aria-label="Progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+          <div className="h-1 rounded-full bg-accent-ink transition-all" style={{ width: `${progress * 100}%` }} />
         </div>
       )}
-      <h1 className="mt-2">{title}</h1>
-      <p className="text-muted">{why}</p>
+      <h1 className="mt-2 text-title1">{title}</h1>
+      <p className="text-secondary">{why}</p>
     </div>
   );
 }
 
-function Nav({ back, next, nextLabel, problem }: { back: () => void; next: () => void; nextLabel: string; problem: string | null }) {
+/** The one primary action at the bottom of an onboarding screen, with the reason if it's blocked. */
+function Continue({ onClick, label, problem }: { onClick: () => void; label: string; problem: string | null }) {
   return (
-    <div className="mt-auto flex flex-col gap-3 pt-4">
-      {problem && <p className="text-sm font-semibold text-alert">{problem}</p>}
-      <div className="flex gap-3">
-        <button className="btn w-auto border border-line bg-white px-8 text-ink" onClick={back}>
-          Back
-        </button>
-        <button className="btn" disabled={!!problem} onClick={next}>
-          {nextLabel}
-        </button>
-      </div>
+    <div className="mt-auto flex flex-col gap-4 pt-4">
+      {problem && (
+        <p role="alert" className="flex gap-2 text-subhead font-semibold text-danger">
+          <Icon name="alert" className="mt-0.5 size-4 shrink-0" />
+          {problem}
+        </p>
+      )}
+      <button className="btn" disabled={!!problem} onClick={onClick}>
+        {label}
+      </button>
     </div>
   );
 }
 
 function DateInput({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
-    <label className="flex flex-1 flex-col gap-1 text-sm text-muted">
+    <label className="flex min-w-0 flex-1 flex-col gap-2 text-subhead text-secondary">
       {label}
-      <input type="date" className="field text-ink" value={value} onChange={(e) => onChange(e.target.value)} />
+      <input type="date" className="field" value={value} onChange={(e) => onChange(e.target.value)} />
     </label>
   );
 }

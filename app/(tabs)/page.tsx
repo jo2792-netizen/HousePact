@@ -4,10 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, type ChangeEvent } from "react";
 import { ApartmentArt } from "@/components/apartment-art";
-import { BillRow, Card, ChoreRow, EventRow, RentCard, Stat, ViewAll } from "@/components/cards";
-import { Icon } from "@/components/icons";
+import { BillRow, Card, ChoreRow, EventRow, RentCard, SeeAll, Stat } from "@/components/cards";
+import { Icon, type IconName } from "@/components/icons";
 import { AddBill, AddChore, AddEvent } from "@/components/sheets";
-import { DotPicker } from "@/components/ui";
+import { Select } from "@/components/ui";
 import { DISHES, GUEST_NOTICE, PARTIES, clock, label, longDate } from "@/lib/agreement";
 import { allBills, debts, greeting, headsUp, isDone, money, rentStatus, time, upcoming, when } from "@/lib/house";
 import { reset, update, useHouse } from "@/lib/store";
@@ -15,12 +15,11 @@ import { reset, update, useHouse } from "@/lib/store";
 export default function Home() {
   const h = useHouse();
   const [copied, setCopied] = useState(false);
-  const [adding, setAdding] = useState<"bill" | "chore" | "event" | null>(null);
+  const [adding, setAdding] = useState<"Bill" | "Chore" | "Event" | null>(null);
   const photoInput = useRef<HTMLInputElement>(null);
   if (!h) return null;
 
   const { household, answers, signatures } = h.agreement;
-  const me = h.mates[h.me];
   const rent = rentStatus(h);
   const owed = debts(h);
   const iOwe = owed.filter((d) => d.from === h.me).reduce((sum, d) => sum + d.amount, 0);
@@ -46,6 +45,13 @@ export default function Home() {
     ["Dishes", `Washed ${label(DISHES, answers.dishes).toLowerCase()}`],
   ];
 
+  const info: [IconName, string, string | undefined][] = [
+    ["trash", "Trash pickup", h.info.trash],
+    ["phone", "Super", h.info.super],
+    ["alert", "Emergency", h.info.emergency],
+    ["key", "Water shutoff", h.info.water],
+  ];
+
   const copyWifi = () =>
     navigator.clipboard.writeText(h.info.password).then(() => {
       setCopied(true);
@@ -66,55 +72,56 @@ export default function Home() {
     update({ photo: canvas.toDataURL("image/jpeg", 0.8) });
   };
 
+  const photoButton = "flex h-11 items-center gap-2 rounded-xl bg-surface/80 px-4 text-subhead font-semibold text-accent-ink backdrop-blur-md";
+
   return (
     <>
       {/* Greeting and whose dashboard this is */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-muted">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+          <p className="text-secondary">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
           <h1>
-            {greeting()}, {me}
+            {greeting()}, {h.mates[h.me]}
           </h1>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted">Viewing as</span>
-          <DotPicker mates={h.mates} value={h.me} onChange={(i) => update({ me: i })} />
+        <div className="w-full sm:w-56">
+          <p className="mb-1 text-subhead text-secondary">Viewing as</p>
+          <Select label="Viewing as" options={h.mates.map((name, i) => ({ value: i, label: name }))} value={h.me} onChange={(i) => update({ me: i })} />
         </div>
       </div>
 
       {/* The apartment */}
-      <section className="overflow-hidden rounded-2xl border border-line bg-white">
-        <div className="relative h-44 bg-paper sm:h-60 lg:h-72">
+      <section className="overflow-hidden rounded-2xl bg-surface">
+        <div className="relative h-44 bg-fill sm:h-64">
           {h.photo ? (
             <Image src={h.photo} alt={`Photo of ${h.name}`} fill unoptimized className="object-cover" />
           ) : (
             <ApartmentArt className="size-full" />
           )}
-          <div className="absolute right-3 bottom-3 flex gap-2">
+          <div className="absolute right-4 bottom-4 flex gap-2">
             {h.photo && (
-              <button onClick={() => update({ photo: undefined })} className="h-10 rounded-full bg-white/90 px-4 text-sm font-semibold">
-                Remove
+              <button onClick={() => update({ photo: undefined })} className={photoButton}>
+                Remove Photo
               </button>
             )}
-            <button onClick={() => photoInput.current?.click()} className="flex h-10 items-center gap-2 rounded-full bg-white/90 px-4 text-sm font-semibold">
+            <button onClick={() => photoInput.current?.click()} className={photoButton}>
               <Icon name="camera" className="size-4" />
-              {h.photo ? "Change photo" : "Add a photo"}
+              {h.photo ? "Change Photo" : "Add Photo"}
             </button>
           </div>
-          <input ref={photoInput} type="file" accept="image/*" className="hidden" aria-label="Apartment photo" onChange={uploadPhoto} />
+          <input ref={photoInput} type="file" accept="image/*" className="hidden" aria-label="Choose an apartment photo" onChange={uploadPhoto} />
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-4 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-6">
           <div className="min-w-0">
-            <h2 className="text-2xl">{h.name}</h2>
-            <p className="text-muted">{household.address}</p>
-            <p className="mt-1 flex items-center gap-2 text-sm text-muted">
-              <Icon name="users" className="size-4" />
+            <h2 className="text-title2 font-bold">{h.name}</h2>
+            <p className="text-secondary">{household.address}</p>
+            <p className="mt-1 text-subhead text-secondary">
               {h.mates.length} roommates · Lease {longDate(household.leaseStart)} to {longDate(household.leaseEnd)}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {(["bill", "chore", "event"] as const).map((kind) => (
-              <button key={kind} onClick={() => setAdding(kind)} className="flex h-11 items-center gap-2 rounded-full border border-line px-4 font-semibold hover:border-ink">
+            {(["Bill", "Chore", "Event"] as const).map((kind) => (
+              <button key={kind} onClick={() => setAdding(kind)} className="btn-secondary w-auto px-4">
                 <Icon name="plus" className="size-4" />
                 Add {kind}
               </button>
@@ -125,8 +132,8 @@ export default function Home() {
 
       {/* Heads-up when someone needs quiet in the next day, e.g. an interview */}
       {quiet && (
-        <Link href="/calendar" className="flex items-center gap-4 rounded-2xl border-2 border-ink bg-white p-4">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#E8EEFF] text-[#3155C7]">
+        <Link href="/calendar" className="flex items-center gap-4 rounded-2xl bg-surface p-4 transition hover:bg-fill">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-fill text-secondary">
             <Icon name="moon" />
           </span>
           <div className="min-w-0 flex-1">
@@ -134,20 +141,20 @@ export default function Home() {
               {quiet.by === h.me ? "Hey, you have" : `${h.mates[quiet.by]} has`} {/^[aeiou]/i.test(quiet.kind) ? "an" : "a"} {quiet.kind.toLowerCase()}
               {quiet.note ? `: ${quiet.note}` : ""}
             </p>
-            <p className="text-sm text-muted">
+            <p className="text-subhead text-secondary">
               {when(quiet.start)} to {time(quiet.end)} · Please keep the house quiet
             </p>
           </div>
-          <Icon name="chevron" className="size-5 shrink-0 text-muted" />
+          <Icon name="chevron" className="size-5 shrink-0 text-secondary" />
         </Link>
       )}
 
       {/* At a glance */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat
           label="Your rent share"
           value={money(rent.shares[h.me])}
-          sub={`Due ${rent.due.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · ${rent.paid.includes(h.me) ? "paid" : `in ${rent.days} days`}`}
+          sub={`Due ${rent.due.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · ${rent.paid.includes(h.me) ? "Paid" : `in ${rent.days} days`}`}
           href="/bills"
         />
         {iOwe ? (
@@ -155,12 +162,7 @@ export default function Home() {
         ) : (
           <Stat label={owedToMe ? "You're owed" : "Balance"} value={owedToMe ? money(owedToMe) : "Settled"} sub={owedToMe ? "From your roommates" : "Nobody owes anything"} href="/bills" />
         )}
-        <Stat
-          label="Your chores"
-          value={myOpen.length ? `${myOpen.length} to do` : "All done"}
-          sub={myOpen.length ? `Next: ${myOpen[0].c.name}` : "Nice work"}
-          href="/chores"
-        />
+        <Stat label="Your chores" value={myOpen.length ? `${myOpen.length} to do` : "All done"} sub={myOpen.length ? `Next: ${myOpen[0].c.name}` : "Nice work"} href="/chores" />
         <Stat
           label="Agreement"
           value={`${signed} of ${h.mates.length} signed`}
@@ -173,20 +175,20 @@ export default function Home() {
         <div className="flex flex-col gap-6 lg:col-span-2">
           <RentCard h={h} />
 
-          <Card title="Upcoming chores" icon="chores" action={<ViewAll href="/chores" />}>
+          <Card title="Upcoming Chores" icon="chores" action={<SeeAll href="/chores" />}>
             {openChores.length ? (
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-separator">
                 {openChores.slice(0, 5).map(({ i }) => (
                   <ChoreRow key={i} h={h} i={i} />
                 ))}
               </ul>
             ) : (
-              <p className="text-muted">Every chore is done for now.</p>
+              <p className="text-secondary">Every chore is done for now.</p>
             )}
           </Card>
 
-          <Card title="Recent bills" icon="bills" action={<ViewAll href="/bills" />}>
-            <ul className="divide-y divide-line">
+          <Card title="Recent Bills" icon="bills" action={<SeeAll href="/bills" />}>
+            <ul className="divide-y divide-separator">
               {allBills(h)
                 .slice(0, 4)
                 .map((b, i) => (
@@ -197,45 +199,38 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col gap-6">
-          <Card title="Coming up" icon="calendar" action={<ViewAll href="/calendar" />}>
+          <Card title="Coming Up" icon="calendar" action={<SeeAll href="/calendar" />}>
             {events.length ? (
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-separator">
                 {events.slice(0, 4).map((e, i) => (
                   <EventRow key={i} h={h} e={e} events={events} compact />
                 ))}
               </ul>
             ) : (
-              <p className="text-muted">Nothing planned.</p>
+              <p className="text-secondary">Nothing planned.</p>
             )}
           </Card>
 
-          <Card title="House info" icon="info" action={<ViewAll href="/info" label="All info" />}>
-            <ul className="divide-y divide-line">
-              <li className="flex items-center gap-3 py-3">
-                <Icon name="wifi" className="size-5 shrink-0 text-muted" />
+          <Card title="House Info" icon="info" action={<SeeAll href="/info" />}>
+            <ul className="divide-y divide-separator">
+              <li className="flex min-h-14 items-center gap-4 py-2">
+                <Icon name="wifi" className="size-5 shrink-0 text-secondary" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{h.info.wifi || "WiFi"}</p>
-                  <p className="text-sm tracking-widest text-muted">••••••••</p>
+                  <p className="text-subhead text-secondary">WiFi</p>
+                  <p className="break-all">{h.info.wifi || "Not added yet"}</p>
                 </div>
                 {h.info.password && (
-                  <button onClick={copyWifi} className="flex h-9 items-center gap-1 rounded-full bg-paper px-3 text-sm font-semibold">
+                  <button onClick={copyWifi} className="btn-secondary h-11 w-auto px-4 text-subhead">
                     <Icon name={copied ? "check" : "copy"} className="size-4" />
-                    {copied ? "Copied" : "Copy password"}
+                    {copied ? "Copied" : "Copy Password"}
                   </button>
                 )}
               </li>
-              {(
-                [
-                  ["trash", "Trash pickup", h.info.trash],
-                  ["phone", "Super", h.info.super],
-                  ["alert", "Emergency", h.info.emergency],
-                  ["key", "Water shutoff", h.info.water],
-                ] as const
-              ).map(([icon, title, value]) => (
-                <li key={title} className="flex items-center gap-3 py-3">
-                  <Icon name={icon} className="size-5 shrink-0 text-muted" />
+              {info.map(([icon, title, value]) => (
+                <li key={title} className="flex min-h-14 items-center gap-4 py-2">
+                  <Icon name={icon} className="size-5 shrink-0 text-secondary" />
                   <div className="min-w-0">
-                    <p className="text-sm text-muted">{title}</p>
+                    <p className="text-subhead text-secondary">{title}</p>
                     <p className="truncate">{value || "Not added yet"}</p>
                   </div>
                 </li>
@@ -243,11 +238,11 @@ export default function Home() {
             </ul>
           </Card>
 
-          <Card title="House rules" icon="agreement" action={<ViewAll href="/pact" label="Agreement" />}>
-            <dl className="flex flex-col gap-3">
+          <Card title="House Rules" icon="agreement" action={<SeeAll href="/pact" label="Agreement" />}>
+            <dl className="flex flex-col gap-4">
               {rules.map(([term, value]) => (
                 <div key={term}>
-                  <dt className="text-sm text-muted">{term}</dt>
+                  <dt className="text-subhead text-secondary">{term}</dt>
                   <dd className="font-semibold">{value}</dd>
                 </div>
               ))}
@@ -256,14 +251,14 @@ export default function Home() {
         </div>
       </div>
 
-      <button onClick={reset} className="flex items-center gap-2 self-center px-4 py-3 text-sm text-muted md:hidden">
+      <button onClick={reset} className="flex h-11 items-center gap-2 self-center px-4 text-subhead text-secondary md:hidden">
         <Icon name="reset" className="size-4" />
-        Reset demo
+        Reset Demo
       </button>
 
-      {adding === "bill" && <AddBill h={h} onClose={() => setAdding(null)} />}
-      {adding === "chore" && <AddChore h={h} onClose={() => setAdding(null)} />}
-      {adding === "event" && <AddEvent h={h} onClose={() => setAdding(null)} />}
+      {adding === "Bill" && <AddBill h={h} onClose={() => setAdding(null)} />}
+      {adding === "Chore" && <AddChore h={h} onClose={() => setAdding(null)} />}
+      {adding === "Event" && <AddEvent h={h} onClose={() => setAdding(null)} />}
     </>
   );
 }

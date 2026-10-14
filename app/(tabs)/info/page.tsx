@@ -25,20 +25,20 @@ export default function Info() {
 
   return (
     <>
-      <PageHeader title="Apartment info" subtitle={`${h.agreement.household.address}. Tap any field to edit it; changes save automatically.`} />
+      <PageHeader title="Apartment Info" subtitle={`${h.agreement.household.address}. Tap any field to edit it; changes save automatically.`} />
       <div className="grid gap-6 lg:grid-cols-2">
         {SECTIONS.map(({ title, icon, fields }) => (
           <Card key={title} title={title} icon={icon}>
-            <div className="divide-y divide-line">
+            <div className="divide-y divide-separator">
               {fields.map(([key, label]) => (
-                <label key={key} className="flex flex-col py-3">
-                  <span className="text-sm text-muted">{label}</span>
+                <label key={key} className="flex min-h-14 flex-col justify-center py-2">
+                  <span className="text-subhead text-secondary">{label}</span>
                   <input
                     value={h.info[key] ?? ""}
                     placeholder="Add"
                     aria-label={label}
                     onChange={(e) => update({ info: { ...h.info, [key]: e.target.value } })}
-                    className="bg-transparent outline-none"
+                    className="min-h-11 bg-transparent outline-none placeholder:text-secondary"
                   />
                 </label>
               ))}
@@ -46,12 +46,12 @@ export default function Info() {
           </Card>
         ))}
 
-        <Card title="Condition notes" icon="camera">
-          <div className="divide-y divide-line">
+        <Card title="Condition Notes" icon="camera">
+          <div className="divide-y divide-separator">
             {h.notes.map((n, i) => (
-              <div key={i} className="py-3">
+              <div key={i} className="py-2">
                 <p>{n.text}</p>
-                <p className="text-sm text-muted">{day(n.at)}</p>
+                <p className="text-subhead text-secondary">{day(n.at)}</p>
               </div>
             ))}
             <form onSubmit={addNote} className="flex items-center gap-2 py-2">
@@ -60,10 +60,10 @@ export default function Info() {
                 placeholder="Add a note"
                 aria-label="Condition note"
                 onChange={(e) => setNote(e.target.value)}
-                className="h-12 min-w-0 flex-1 bg-transparent outline-none"
+                className="h-12 min-w-0 flex-1 bg-transparent outline-none placeholder:text-secondary"
               />
-              <button disabled={!note.trim()} className="btn h-12 w-auto">
-                Add
+              <button disabled={!note.trim()} className="btn w-auto">
+                Add Note
               </button>
             </form>
           </div>

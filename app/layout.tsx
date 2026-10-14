@@ -1,10 +1,9 @@
-import type { Metadata } from "next";
-import { Bricolage_Grotesque, Dancing_Script, Figtree, Source_Serif_4 } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Dancing_Script, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-const heading = Bricolage_Grotesque({ variable: "--font-bricolage", subsets: ["latin"] });
-const body = Figtree({ variable: "--font-figtree", subsets: ["latin"] });
-const serif = Source_Serif_4({ variable: "--font-source-serif", subsets: ["latin"] }); // the agreement document
+// The app uses the system font. These two are only for the agreement document.
+const serif = Source_Serif_4({ variable: "--font-source-serif", subsets: ["latin"] });
 const script = Dancing_Script({ variable: "--font-dancing", subsets: ["latin"] }); // signatures
 
 export const metadata: Metadata = {
@@ -12,9 +11,17 @@ export const metadata: Metadata = {
   description: "No awkward conversations, just agree once.",
 };
 
+export const viewport: Viewport = {
+  viewportFit: "cover", // lets the layout respect the notch and home indicator
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f2f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${heading.variable} ${body.variable} ${serif.variable} ${script.variable}`}>
+    <html lang="en" className={`${serif.variable} ${script.variable}`}>
       <body>{children}</body>
     </html>
   );

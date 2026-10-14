@@ -1,4 +1,5 @@
 // The default apartment picture: a flat illustration of a brownstone, used until the house adds a photo.
+// Decorative, so it is hidden from screen readers. Its sky and street follow Light and Dark Mode.
 
 const GLASS = "#2C3E57";
 const LIT = "#FFE3A1";
@@ -30,18 +31,18 @@ function Tree({ x }: { x: number }) {
 export function ApartmentArt({ className = "" }: { className?: string }) {
   const columns = [345, 475, 655, 785];
   return (
-    <svg viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" className={className} role="img" aria-label="Illustration of the apartment building">
+    <svg viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" className={className} aria-hidden>
       {/* Sky */}
-      <rect width="1200" height="420" fill="#DCE8F7" />
+      <rect width="1200" height="420" fill="var(--art-sky)" />
       <circle cx="1060" cy="88" r="46" fill="#FFD95A" />
-      <ellipse cx="180" cy="80" rx="70" ry="18" fill="#FFFFFF" opacity="0.8" />
-      <ellipse cx="960" cy="150" rx="55" ry="14" fill="#FFFFFF" opacity="0.7" />
+      <ellipse cx="180" cy="80" rx="70" ry="18" fill="var(--art-cloud)" opacity="0.8" />
+      <ellipse cx="960" cy="150" rx="55" ry="14" fill="var(--art-cloud)" opacity="0.7" />
 
       {/* Neighboring buildings */}
-      <rect x="0" y="130" width="250" height="290" fill="#CDBBA7" />
-      {[160, 240, 320].map((y) => [30, 110, 190].map((x) => <rect key={`${x}-${y}`} x={x} y={y} width="40" height="54" fill="#EFE7DC" />))}
-      <rect x="950" y="170" width="250" height="250" fill="#AEB8C6" />
-      {[200, 280].map((y) => [985, 1065, 1145].map((x) => <rect key={`${x}-${y}`} x={x} y={y} width="36" height="50" fill="#DCE2EA" />))}
+      <rect x="0" y="130" width="250" height="290" fill="var(--art-left)" />
+      {[160, 240, 320].map((y) => [30, 110, 190].map((x) => <rect key={`${x}-${y}`} x={x} y={y} width="40" height="54" fill="var(--art-window)" />))}
+      <rect x="950" y="170" width="250" height="250" fill="var(--art-right)" />
+      {[200, 280].map((y) => [985, 1065, 1145].map((x) => <rect key={`${x}-${y}`} x={x} y={y} width="36" height="50" fill="var(--art-window)" />))}
 
       {/* The brownstone */}
       <rect x="300" y="64" width="600" height="340" fill="#9A5A43" />
@@ -71,7 +72,7 @@ export function ApartmentArt({ className = "" }: { className?: string }) {
       <Tree x={955} />
 
       {/* Sidewalk */}
-      <rect x="0" y="404" width="1200" height="16" fill="#C7CED8" />
+      <rect x="0" y="404" width="1200" height="16" fill="var(--art-street)" />
     </svg>
   );
 }

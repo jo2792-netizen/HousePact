@@ -2,12 +2,18 @@
 
 // The "Add" panels, shared by Home's quick actions and each tab.
 import { useState } from "react";
-import { Choice, DotPicker, Field, Sheet } from "@/components/ui";
+import { Choice, Field, NamePicker, Sheet } from "@/components/ui";
 import { toYMD } from "@/lib/agreement";
 import { CATEGORIES, EVENTS, MOODS, money, type Mood } from "@/lib/house";
 import { update, type Chore, type House } from "@/lib/store";
 
 type Props = { h: House; onClose: () => void };
+
+const MOOD_HELP: Record<Mood, string> = {
+  quiet: "You need the house quiet. Overlapping busy events get flagged.",
+  busy: "Guests, noise, or the kitchen in use.",
+  info: "Just letting everyone know.",
+};
 
 export function AddChore({ h, onClose }: Props) {
   const [name, setName] = useState("");
@@ -16,16 +22,19 @@ export function AddChore({ h, onClose }: Props) {
 
   return (
     <Sheet
-      title="Add chore"
+      title="New Chore"
+      action="Add Chore"
       canSave={!!name.trim()}
       onSave={() => update({ chores: [...h.chores, { name: name.trim(), who, often }] })}
       onClose={onClose}
     >
-      <input autoFocus className="field" placeholder="e.g. Take out trash" aria-label="Chore" value={name} onChange={(e) => setName(e.target.value)} />
-      <Field label="Who">
-        <DotPicker mates={h.mates} value={who} onChange={setWho} />
+      <Field label="Chore">
+        <input autoFocus className="field" placeholder="For example, Take out trash" aria-label="Chore" value={name} onChange={(e) => setName(e.target.value)} />
       </Field>
-      <Field label="How often">
+      <Field label="Assigned To">
+        <NamePicker label="Assigned to" mates={h.mates} value={who} onChange={setWho} />
+      </Field>
+      <Field label="Repeats" help="Daily chores reset each day. Weekly chores reset after 7 days.">
         <div className="grid grid-cols-2 gap-2">
           {(["Daily", "Weekly"] as const).map((o) => (
             <Choice key={o} on={often === o} onClick={() => setOften(o)}>
@@ -47,12 +56,13 @@ export function AddBill({ h, onClose }: Props) {
 
   return (
     <Sheet
-      title="Add bill"
+      title="New Bill"
+      action="Add Bill"
       canSave={value > 0}
       onSave={() => update({ bills: [...h.bills, { amount: value, paidBy, category, note: note.trim(), at: new Date().toISOString() }] })}
       onClose={onClose}
     >
-      <label className="field flex h-16 items-center gap-1 text-3xl font-bold">
+      <label className="field flex h-16 items-center gap-1 text-title1 font-bold">
         $
         <input
           autoFocus
@@ -61,17 +71,19 @@ export function AddBill({ h, onClose }: Props) {
           aria-label="Amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))}
-          className="min-w-0 flex-1 outline-none"
+          className="h-full min-w-0 flex-1 bg-transparent outline-none"
         />
       </label>
       {value > 0 && (
-        <p className="-mt-3 text-sm text-muted">
+        <p className="-mt-4 text-subhead text-secondary">
           Split {h.mates.length} ways: {money(value / h.mates.length)} each
         </p>
       )}
-      <input className="field" placeholder="What for? (optional)" aria-label="What for" value={note} onChange={(e) => setNote(e.target.value)} />
-      <Field label="Paid by">
-        <DotPicker mates={h.mates} value={paidBy} onChange={setPaidBy} />
+      <Field label="Description" help="Optional. Shown in the bills list.">
+        <input className="field" placeholder="For example, Con Ed electric" aria-label="Description" value={note} onChange={(e) => setNote(e.target.value)} />
+      </Field>
+      <Field label="Paid By">
+        <NamePicker label="Paid by" mates={h.mates} value={paidBy} onChange={setPaidBy} />
       </Field>
       <Field label="Category">
         <div className="grid grid-cols-2 gap-2">
@@ -108,9 +120,9 @@ export function AddEvent({ h, onClose }: Props) {
   };
 
   return (
-    <Sheet title="Add event" canSave={!!(date && from && to)} onSave={save} onClose={onClose}>
+    <Sheet title="New Event" action="Add Event" canSave={!!(date && from && to)} onSave={save} onClose={onClose}>
       {(Object.keys(MOODS) as Mood[]).map((mood) => (
-        <Field key={mood} label={MOODS[mood]}>
+        <Field key={mood} label={MOODS[mood]} help={MOOD_HELP[mood]}>
           <div className="flex flex-wrap gap-2">
             {Object.entries(EVENTS)
               .filter(([, type]) => type.mood === mood)
@@ -122,7 +134,9 @@ export function AddEvent({ h, onClose }: Props) {
           </div>
         </Field>
       ))}
-      <input className="field" placeholder="Details (optional)" aria-label="Details" value={note} onChange={(e) => setNote(e.target.value)} />
+      <Field label="Details" help="Optional. For example, Video interview with Google.">
+        <input className="field" aria-label="Details" value={note} onChange={(e) => setNote(e.target.value)} />
+      </Field>
       <Field label="Day">
         <input type="date" aria-label="Day" className="field" value={date} onChange={(e) => setDate(e.target.value)} />
       </Field>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AddButton, BillRow, Card, PageHeader, RentCard, Stat } from "@/components/cards";
 import { AddBill } from "@/components/sheets";
+import { Icon } from "@/components/icons";
 import { Dot } from "@/components/ui";
 import { PAYMENT, allBills, debts, money, spentThisMonth } from "@/lib/house";
 import { update, useHouse } from "@/lib/store";
@@ -34,10 +35,10 @@ export default function Bills() {
       <PageHeader
         title="Bills"
         subtitle={`Shared costs are split equally ${h.mates.length} ways and tracked here.`}
-        action={<AddButton label="Add bill" onClick={() => setAdding(true)} />}
+        action={<AddButton label="Add Bill" onClick={() => setAdding(true)} />}
       />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <Stat label="Spent this month" value={money(spent)} sub="Shared costs, not rent" />
         <Stat label="Your share this month" value={money(spent / h.mates.length)} sub={`One of ${h.mates.length} equal shares`} />
         {iOwe ? (
@@ -51,25 +52,26 @@ export default function Bills() {
         <div className="flex flex-col gap-6 lg:col-span-2">
           <Card title="Balances" icon="users">
             {owed.length ? (
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-separator">
                 {owed.map(({ from, to, amount }) => (
-                  <li key={`${from}-${to}`} className="flex flex-col gap-2 py-3">
-                    <div className="flex items-center gap-2">
+                  <li key={`${from}-${to}`} className="flex flex-col gap-2 py-4">
+                    <div className="flex items-center gap-4">
                       <Dot i={from} name={h.mates[from]} />
                       <p className="min-w-0 flex-1">
                         <span className="font-semibold">{name(from)}</span> {from === h.me ? "owe" : "owes"}{" "}
                         <span className="font-semibold">{to === h.me ? "you" : name(to)}</span>
                       </p>
-                      <span className={`text-xl font-bold tabular-nums ${from === h.me ? "text-alert" : ""}`}>{money(amount)}</span>
+                      <span className={`text-title3 font-bold tabular-nums ${from === h.me ? "text-danger" : ""}`}>{money(amount)}</span>
                     </div>
-                    <button onClick={() => settle(from, to, amount)} className="self-end rounded-full border border-line px-4 py-2 text-sm font-semibold hover:border-ink">
-                      Mark paid
+                    <button onClick={() => settle(from, to, amount)} className="btn-secondary h-11 w-auto self-end px-4 text-subhead">
+                      <Icon name="check" className="size-4" />
+                      Mark as Paid
                     </button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-muted">Everyone is settled up.</p>
+              <p className="text-secondary">Everyone is settled up.</p>
             )}
           </Card>
           <RentCard h={h} />
@@ -77,12 +79,12 @@ export default function Bills() {
 
         <Card title="Expenses" icon="bills" className="lg:col-span-3">
           {[...months].map(([month, bills]) => (
-            <div key={month} className="mt-2 first:mt-0">
-              <h3 className="flex justify-between border-b border-line pb-2 text-sm font-semibold text-muted">
+            <div key={month} className="mt-4 first:mt-0">
+              <h3 className="flex justify-between border-b border-separator py-2 text-subhead font-semibold text-secondary">
                 <span>{month}</span>
                 <span>{money(bills.filter((b) => b.paidTo === undefined).reduce((sum, b) => sum + b.amount, 0))}</span>
               </h3>
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-separator">
                 {bills.map((b, i) => (
                   <BillRow key={i} h={h} b={b} />
                 ))}

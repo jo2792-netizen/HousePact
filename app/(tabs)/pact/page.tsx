@@ -2,6 +2,7 @@
 
 import { AgreementDocument } from "@/components/agreement";
 import { PageHeader } from "@/components/cards";
+import { Icon } from "@/components/icons";
 import { update, useHouse } from "@/lib/store";
 
 // The signed Roommate Agreement. Roommates who haven't signed yet can sign here.
@@ -20,7 +21,8 @@ export default function Pact() {
           title="Agreement"
           subtitle={signed === h.mates.length ? "Signed by everyone. This is your house's official agreement." : `${signed} of ${h.mates.length} roommates have signed. Anyone left can sign at the bottom.`}
           action={
-            <button className="btn h-11 w-auto px-5" onClick={() => window.print()}>
+            <button className="btn w-auto" onClick={() => window.print()}>
+              <Icon name="download" />
               Download as PDF
             </button>
           }

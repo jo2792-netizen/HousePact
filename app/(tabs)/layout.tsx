@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Logo } from "@/components/agreement";
 import { Icon, type IconName } from "@/components/icons";
+import { Logo, NavBar } from "@/components/ui";
 import { reset, useHouse } from "@/lib/store";
 
 const TABS: [string, string, IconName][] = [
@@ -15,8 +15,8 @@ const TABS: [string, string, IconName][] = [
   ["/calendar", "Calendar", "calendar"],
 ];
 
-// Wraps every screen except Setup: sends first-time visitors to Setup, and shows a
-// sidebar on larger screens or a bottom tab bar on phones.
+// Wraps every screen except Setup: sends first-time visitors to Setup. Phones get a top
+// navigation bar and a bottom tab bar; larger screens get a sidebar.
 export default function TabsLayout({ children }: { children: React.ReactNode }) {
   const house = useHouse();
   const router = useRouter();
@@ -26,61 +26,61 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
     if (house === null) router.replace("/setup");
   }, [house, router]);
 
-  const isActive = (href: string) => (href === "/" ? path === "/" || path === "/info" : path.startsWith(href));
+  const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 
   return (
     <>
-      {/* Sidebar (tablet and up) */}
-      <aside className="fixed inset-y-0 left-0 z-10 hidden w-60 flex-col border-r border-line bg-white p-4 md:flex print:hidden">
-        <div className="flex items-center gap-2 px-2 py-2 font-heading text-lg font-semibold">
+      {/* Phones: navigation bar with the logo */}
+      <div className="md:hidden">
+        <NavBar />
+      </div>
+
+      {/* Tablets and laptops: sidebar with the logo at the top */}
+      <aside className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col gap-6 border-r border-separator bg-surface p-4 md:flex print:hidden">
+        <div className="flex h-11 items-center px-2">
           <Logo />
-          Housepact
         </div>
         {house && (
-          <div className="mt-4 rounded-xl bg-paper px-3 py-3">
+          <div className="px-2">
             <p className="font-semibold">{house.name}</p>
-            <p className="text-sm text-muted">{house.mates.length} roommates</p>
+            <p className="text-subhead text-secondary">{house.mates.length} roommates</p>
           </div>
         )}
-        <nav className="mt-4 flex flex-col gap-1">
-          {TABS.map(([href, label, icon]) => (
+        <nav aria-label="Main" className="flex flex-col gap-1">
+          {[...TABS, ["/info", "Apartment Info", "info"] as [string, string, IconName]].map(([href, label, icon]) => (
             <Link
               key={href}
               href={href}
               aria-current={isActive(href) ? "page" : undefined}
-              className={`flex h-11 items-center gap-3 rounded-xl px-3 ${isActive(href) ? "bg-ink font-semibold text-white" : "text-muted hover:bg-paper hover:text-ink"}`}
+              className={`flex h-11 items-center gap-4 rounded-xl px-2 ${isActive(href) ? "bg-accent-wash font-semibold text-label" : "text-secondary hover:bg-fill hover:text-label"}`}
             >
-              <Icon name={icon} />
+              <Icon name={icon} className={isActive(href) ? "size-5 text-accent-ink" : "size-5"} />
               {label}
             </Link>
           ))}
-          <Link
-            href="/info"
-            className={`flex h-11 items-center gap-3 rounded-xl px-3 ${path === "/info" ? "bg-paper font-semibold" : "text-muted hover:bg-paper hover:text-ink"}`}
-          >
-            <Icon name="info" />
-            Apartment info
-          </Link>
         </nav>
-        <button onClick={reset} className="mt-auto flex h-11 items-center gap-3 rounded-xl px-3 text-sm text-muted hover:bg-paper hover:text-ink">
+        <button onClick={reset} className="mt-auto flex h-11 items-center gap-4 rounded-xl px-2 text-subhead text-secondary hover:bg-fill hover:text-label">
           <Icon name="reset" />
-          Reset demo
+          Reset Demo
         </button>
       </aside>
 
-      <div className="md:pl-60 print:pl-0">
-        <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pt-6 pb-28 md:px-8 md:pt-8 md:pb-12 print:max-w-none print:p-0">{children}</main>
+      <div className="md:pl-64 print:pl-0">
+        <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pt-6 pb-32 md:px-8 md:pt-8 md:pb-16 print:max-w-none print:p-0">{children}</main>
       </div>
 
-      {/* Bottom tabs (phones) */}
-      <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden print:hidden">
-        <div className="flex">
+      {/* Phones: tab bar, above the home indicator */}
+      <nav
+        aria-label="Main"
+        className="fixed inset-x-0 bottom-0 z-20 border-t border-separator bg-bg/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden print:hidden"
+      >
+        <div className="flex px-[env(safe-area-inset-left)]">
           {TABS.map(([href, label, icon]) => (
             <Link
               key={href}
               href={href}
               aria-current={isActive(href) ? "page" : undefined}
-              className={`flex h-16 flex-1 flex-col items-center justify-center gap-1 text-sm ${isActive(href) ? "font-semibold text-ink" : "text-muted"}`}
+              className={`flex h-14 min-w-11 flex-1 flex-col items-center justify-center gap-1 text-caption ${isActive(href) ? "font-semibold text-accent-ink" : "text-secondary"}`}
             >
               <Icon name={icon} className="size-6" />
               {label}

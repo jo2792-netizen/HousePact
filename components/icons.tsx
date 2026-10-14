@@ -21,6 +21,11 @@ const PATHS = {
   check: "m5 12 5 5 9-10",
   key: "M15 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM12 12v9M12 17h3M12 20h2",
   dollar: "M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",
+  xmark: "M6 6l12 12M18 6 6 18",
+  back: "m15 5-7 7 7 7",
+  down: "m6 9 6 6 6-6",
+  download: "M12 4v11M7 10l5 5 5-5M5 20h14",
+  pencil: "M4 20h4L19 9l-4-4L4 16zM14 6l4 4",
 };
 
 export type IconName = keyof typeof PATHS;
