@@ -1,48 +1,60 @@
 @import "tailwindcss";
 
-/* Colors and fonts from DESIGN.md */
-@theme inline {
+/* Colors from DESIGN.md */
+@theme {
   --color-paper: #f6f7f9;
-  --color-white: #ffffff;
   --color-ink: #1e2a3a;
-  --color-muted: #7a8494;
+  --color-muted: #66707f; /* DESIGN.md's #7A8494, a bit darker to pass 4.5:1 contrast */
+  --color-line: #e3e6eb;
   --color-note: #ffd95a;
-  --color-alert: #e5484d;
+  --color-alert: #d93a3f; /* DESIGN.md's #E5484D, a bit darker to pass 4.5:1 contrast */
 
-  /* Roommate colors */
-  --color-mate-blue: #4f7cff;
-  --color-mate-green: #2bb673;
-  --color-mate-orange: #f28c38;
-  --color-mate-purple: #a66cff;
-  --color-mate-pink: #ec5fa0;
-  --color-mate-teal: #20b2c4;
-
-  --font-heading: var(--font-heading);
-  --font-sans: var(--font-body);
+  --animate-slide-up: slide-up 0.2s ease-out;
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+  }
 }
 
-body {
-  background: var(--color-paper);
-  color: var(--color-ink);
-  font-family: var(--font-body), sans-serif;
-  font-size: 17px;
+/* Fonts from DESIGN.md, loaded in layout.tsx */
+@theme inline {
+  --font-heading: var(--font-bricolage);
+  --font-sans: var(--font-figtree);
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-heading), sans-serif;
-  font-weight: 600;
+@layer base {
+  body {
+    @apply bg-paper font-sans text-[17px] text-ink antialiased;
+  }
+  h1,
+  h2 {
+    @apply font-heading leading-tight font-semibold;
+  }
+  h1 {
+    @apply text-[28px];
+  }
+  h2 {
+    @apply text-xl;
+  }
+  /* Instant feedback on every tap */
+  button {
+    @apply cursor-pointer transition active:scale-[0.97] disabled:cursor-default disabled:active:scale-100;
+  }
+  :focus-visible {
+    outline: 3px solid #4f7cff;
+    outline-offset: 2px;
+  }
 }
 
-:focus-visible {
-  outline: 3px solid var(--color-mate-blue);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    transition: none !important;
-    animation: none !important;
+@layer components {
+  .card {
+    @apply rounded-xl bg-white p-4;
+  }
+  .btn {
+    @apply flex h-14 w-full shrink-0 items-center justify-center rounded-full bg-ink px-6 font-semibold text-white disabled:opacity-40;
+  }
+  .field {
+    @apply h-14 w-full rounded-xl border border-line bg-white px-4 outline-none focus-within:border-ink;
   }
 }

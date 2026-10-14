@@ -5,36 +5,35 @@
 ## Problem
 Roommate conflicts usually come from expectations that were never written down. Bringing them up later feels awkward, and basic apartment info is scattered across group chats.
 
-## MVP Solution
-Housepact is one place for a household's shared info and rules. Roommates answer a short quiz to generate a house agreement. The app also stores the apartment's key info and tracks chores, bills, and house events at a basic level.
+## Solution
+Housepact is one simple place for a household's info, rules, chores, bills, and schedule. Roommates take a short quiz that generates their house agreement, so the hard conversations happen once.
 
-This MVP is a front-end-only prototype with no database or login. Data is saved in the browser on one device, which is enough to demo the full experience.
+## MVP Approach
+- A working demo for a class presentation. Every feature works, but each one is the simplest possible version.
+- No landing page, no login, no database. Data is saved in the browser (localStorage) on one device.
+- Simple over complete: when in doubt, leave it out.
 
 ## Target User
 College students and young professionals sharing an apartment with 2–6 roommates.
 
-## MVP Features (keep each one simple)
+## Features (simple version of each)
 
-**1. Setup**
-Enter a household name and the roommates' names.
+**Setup.** The app opens on a Setup screen: enter the household name and roommate names, or tap "Load demo house."
 
-**2. Apartment Info**
-One editable page with the WiFi password, trash pickup days, super/HOA contacts, and emergency info (contacts, shutoff valve, breaker box).
+**Apartment Info.** WiFi (tap to copy), trash pickup days, super/HOA contacts, and emergency info (contacts, shutoff valve, breaker box).
 
-**3. Agreement Quiz → Template**
-A short quiz of about 6 multiple-choice questions, covering quiet hours, guests, cleaning, shared items, and what happens if someone breaks a rule. The answers fill in a pre-written agreement template. Each roommate gets an "I agree" checkbox.
+**Condition Tracker.** A short list of notes on the apartment's condition (e.g. "Scratch on kitchen counter, move-in").
 
-**4. Chores**
-A list of chores, each with an assignee and a "done" checkbox.
+**Agreement.** A short multiple-choice quiz covering kitchen & cleanliness, shared spaces & belongings, guests, quiet hours, sublets, and consequences. The answers fill in an agreement template, and each roommate taps to agree.
 
-**5. Bills**
-Add an expense (amount, who paid, category) split equally. The app shows who owes whom.
+**Chores.** Chores with an assignee and a frequency (daily/weekly). Check one off to log who did it and when.
 
-**6. House Calendar**
-A simple list of upcoming events tagged Quiet Time or Hosting.
+**Bills.** Add an expense with an amount, who paid, and a category (repairs, groceries & household, utilities, appliances & furniture). Split equally. Shows who owes whom. The Housepact subscription is included automatically as a monthly shared bill.
 
-## Out of Scope for MVP (future ideas)
-Accounts and a real database so roommates can share across devices, Google Calendar sync, condition tracker, sublet agreements, chore rotation, custom bill splits, payments, and the built-in subscription cost.
+**House Calendar.** Add Quiet Time or Hosting events. A warning appears if they overlap. Each event has an "Add to Google Calendar" link.
+
+## Not in the MVP
+Accounts and syncing across devices, full Google Calendar sync, real payments, custom bill splits, chore rotation, photos, and notifications.
 
 ## Success Metric
-A user can set up a household, generate and sign the agreement, and log a chore and a bill in under 10 minutes.
+In a live demo, someone can set up a household, sign the agreement, check off a chore, add a bill, and add an event in under 5 minutes without instructions.

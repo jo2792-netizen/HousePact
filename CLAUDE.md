@@ -1,22 +1,25 @@
 # CLAUDE.md — Housepact
 
 ## What this is
-Housepact is an MVP web app for roommates, built for a tech product management class. The spec is in `PRD.md`, the build order is in `PLAN.md`, and the look and feel is in `DESIGN.md`. Follow DESIGN.md on every screen: simple, minimal text, easy to use.
+Housepact is a simple MVP demo app for roommates, built for a tech product management class presentation.
+- `PRD.md`: what to build
+- `DESIGN.md`: how it should look and feel
+- `PLAN.md`: the checklist
 
-## How to work with me
-- I'm a PM student, not an experienced developer. Explain things briefly in plain language.
-- Keep it simple. This is an MVP, so build the minimum version of each feature and don't add extras unless I ask.
-- Do one milestone from PLAN.md at a time. Show a short plan first and wait for my OK.
-- After each milestone, tell me how to test it, check it off in PLAN.md, and commit to git.
+## How to work
+- **Build the whole app in one go**, covering everything in PLAN.md. You don't need to stop for approval between steps.
+- **Keep it simple.** This is an MVP. Build the simplest working version of each feature, and don't add anything not in PRD.md.
+- **After building, review everything for simplicity.** Remove extra text, extra buttons, and extra code. If something feels complicated, simplify it.
+- **Then test it** by clicking through the demo flow in PLAN.md and fixing any errors.
+- At the end, give me a short plain-language summary and tell me how to run it. I'm a PM student, not a developer.
+- Commit to git when done.
 
-## Tech stack
+## Tech
 - Next.js + TypeScript + Tailwind CSS
-- **No database, no backend, no login.** Save all data in the browser with localStorage.
-- Optional: deploy on Vercel for a shareable demo link.
-
-## Commands
-- `npm run dev`: run locally at http://localhost:3000
+- No database, no backend, no login. All data is saved in localStorage through one small helper file.
+- No landing page. The app opens on Setup (first visit) or Home.
+- Run with `npm run dev` at http://localhost:3000
 
 ## Rules
-- Keep all data in localStorage, behind one small helper file so it's easy to swap for a real database later.
-- Mobile-friendly layouts.
+- Follow DESIGN.md on every screen: minimal text, easy to use, mobile-first.
+- Prefer fewer files and simple, readable code.

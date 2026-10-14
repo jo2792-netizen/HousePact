@@ -2,17 +2,8 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import "./globals.css";
 
-const heading = Bricolage_Grotesque({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["600"],
-});
-
-const body = Figtree({
-  variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
+const heading = Bricolage_Grotesque({ variable: "--font-bricolage", subsets: ["latin"] });
+const body = Figtree({ variable: "--font-figtree", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Housepact",
@@ -21,11 +12,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${heading.variable} ${body.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${heading.variable} ${body.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }
