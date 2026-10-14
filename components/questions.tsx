@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import { Field, OptionCards, Recommended, Select, Slider, Toggle } from "@/components/ui";
+// Dishes, personal items in shared spaces, guests, and damage reporting aren't asked;
+// the agreement uses the recommended defaults for those.
 import {
-  BORROWING, CAPS, CHORE_SYSTEMS, CLEAN_DEFAULT, CLEAN_LEVELS, DISHES, DISPUTES, DUE, GROCERIES, GUEST_NOTICE, INSURANCE,
-  ITEMS, JOINT, MAKEUP, MEETINGS, NIGHTS_DEFAULT, NOTICE, PARTIES, QUIET_PRESETS, REPORT, SPLITS, SUBLET, UNATTRIBUTED,
-  UTILITIES, ZONES, clock, dollars, evenPercents, percentTotal, rentShares, type Answers,
+  BORROWING, CHORE_SYSTEMS, CLEAN_DEFAULT, CLEAN_LEVELS, DISPUTES, DUE, GROCERIES, INSURANCE, JOINT, MAKEUP, MEETINGS,
+  NOTICE, QUIET_PRESETS, SPLITS, SUBLET, UNATTRIBUTED, UTILITIES, ZONES, clock, dollars, evenPercents, percentTotal, rentShares,
+  type Answers,
 } from "@/lib/agreement";
 
 type Props = { a: Answers; set: (changes: Partial<Answers>) => void; names: string[] };
@@ -33,9 +35,6 @@ export const QUESTIONS: {
               </p>
               <p className="text-subhead text-secondary">{level.help}</p>
             </div>
-          </Field>
-          <Field label="Dishes are washed">
-            <OptionCards options={DISHES} value={a.dishes} onChange={(dishes) => set({ dishes })} columns={3} />
           </Field>
         </>
       );
@@ -169,43 +168,8 @@ export const QUESTIONS: {
         <Field label="Using someone else's food">
           <OptionCards options={BORROWING} value={a.borrowing} onChange={(borrowing) => set({ borrowing })} columns={3} />
         </Field>
-        <Field label="Personal items can stay in shared spaces for">
-          <OptionCards options={ITEMS} value={a.items} onChange={(items) => set({ items })} columns={3} />
-        </Field>
         <Field label="Things you buy together, when someone moves out">
           <OptionCards options={JOINT} value={a.joint} onChange={(joint) => set({ joint })} columns={2} />
-        </Field>
-      </>
-    ),
-  },
-  {
-    title: "Guests",
-    short: "Guests",
-    why: "Guests change the home for everyone, so it helps to agree on limits upfront.",
-    Body: ({ a, set }) => (
-      <>
-        <Field label="Notice for overnight guests">
-          <OptionCards options={GUEST_NOTICE} value={a.guestNotice} onChange={(guestNotice) => set({ guestNotice })} columns={3} />
-        </Field>
-        <Field label="Longest stay in a row" help="After this, everyone has to approve.">
-          <div className="rounded-xl bg-surface p-4">
-            <p className="flex items-center justify-between font-semibold">
-              {a.nights} night{a.nights === 1 ? "" : "s"}
-              {a.nights === NIGHTS_DEFAULT && <Recommended />}
-            </p>
-            <Slider label="Maximum consecutive nights" min={1} max={7} value={a.nights} onChange={(nights) => set({ nights })} left="1 night" right="7 nights" />
-          </div>
-        </Field>
-        <Field label="Guest nights per month" help="Total across all of one roommate's guests.">
-          <Select
-            label="Guest nights per month"
-            options={CAPS.map((c) => ({ value: c.value, label: c.label + (c.rec ? " (Recommended)" : "") }))}
-            value={a.cap}
-            onChange={(cap) => set({ cap })}
-          />
-        </Field>
-        <Field label="Parties" help="A party means more than six guests at once.">
-          <OptionCards options={PARTIES} value={a.parties} onChange={(parties) => set({ parties })} columns={3} />
         </Field>
       </>
     ),
@@ -274,9 +238,6 @@ export const QUESTIONS: {
     why: "Deciding who pays before something breaks keeps the deposit conversation calm.",
     Body: ({ a, set }) => (
       <>
-        <Field label="Report damage or problems">
-          <OptionCards options={REPORT} value={a.report} onChange={(report) => set({ report })} columns={3} />
-        </Field>
         <Field label="When no one knows who caused it">
           <OptionCards options={UNATTRIBUTED} value={a.unattributed} onChange={(unattributed) => set({ unattributed })} columns={2} />
         </Field>

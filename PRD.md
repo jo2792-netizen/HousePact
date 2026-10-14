@@ -20,13 +20,13 @@ College students and young professionals sharing an apartment with 2–6 roommat
 
 ## Features (simple version of each)
 
-**Setup.** The app opens on an onboarding flow: a welcome screen, household details (address, your name, 1 to 5 roommates to invite by email, lease dates, effective date), eight questions, a review screen with an Edit link per section, and the generated agreement. "Open Household Dashboard" then opens Home, filled with realistic example info, chores, bills, and events. A small Reset starts onboarding over. For demos, the whole flow starts filled in with a realistic sample household and answers (address, names, rent split, every question, signatures, and examples in the Add forms), so it works with taps alone.
+**Setup.** The app opens on an onboarding flow: a welcome screen, household details (address, your name, 1 to 5 roommates to invite by email, lease dates, effective date), seven questions, a review screen with an Edit link per section, and the generated agreement. "Open Household Dashboard" then opens Home, filled with realistic example info, chores, bills, and events. A small Reset starts onboarding over. For demos, the whole flow starts filled in with a realistic sample household and answers (address, names, rent split, every question, signatures, and examples in the Add forms), so it works with taps alone.
 
 **Apartment Info.** WiFi (tap to copy), trash pickup days, super/HOA contacts, and emergency info (contacts, shutoff valve, breaker box).
 
 **Condition Tracker.** A short list of notes on the apartment's condition (e.g. "Scratch on kitchen counter, move-in").
 
-**Agreement.** Eight question screens (cleanliness; chores; rent, utilities, and groceries; food and belongings; guests; quiet hours; damage; sublets, move-out, and disagreements) using sliders, option cards, toggles, and dropdowns, each with a recommended default. A template function turns the answers into a formal Residential Roommate Agreement: ten numbered articles, a rent split table, a chore rotation schedule, standard provisions, and type-to-sign signatures that mark it "Fully Executed." It can be downloaded as a PDF and is viewable later from the Pact tab.
+**Agreement.** Seven question screens (cleanliness; chores; rent, utilities, and groceries; food and belongings; quiet hours; damage; sublets, move-out, and disagreements) using sliders, option cards, toggles, and dropdowns, each with a recommended default. A template function turns the answers into a formal Residential Roommate Agreement: ten numbered articles, a rent split table, a chore rotation schedule, standard provisions, and type-to-sign signatures that mark it "Fully Executed." It can be downloaded as a PDF and is viewable later from the Pact tab. Dishes, personal items in shared spaces, guests, and damage reporting aren't asked; the agreement uses the recommended defaults for those.
 
 **Chores.** Chores with an assignee and a frequency (daily/weekly). Check one off to log who did it and when.
 

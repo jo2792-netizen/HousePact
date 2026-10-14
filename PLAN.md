@@ -4,7 +4,7 @@ Build everything below in one pass, keeping each feature as simple as possible. 
 
 ## Build
 - [x] Next.js app with no landing page. It opens on Setup (first visit) or Home.
-- [x] Onboarding: welcome → household details (all pre-filled) → 8 questions → review → agreement → Home
+- [x] Onboarding: welcome → household details (all pre-filled) → 7 questions → review → agreement → Home
 - [x] Bottom tabs: Home, Pact, Chores, Bills, Calendar
 - [x] Home: today summary, WiFi tap-to-copy, trash day, contacts & emergency info, condition notes, and a small Reset option
 - [x] Agreement: formal document generated from the answers, type-to-sign, Fully Executed status, Download as PDF

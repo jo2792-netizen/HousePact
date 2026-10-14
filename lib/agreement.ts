@@ -444,7 +444,7 @@ export function summary(h: Household, a: Answers) {
         `Effective ${longDate(h.effective)}`,
       ],
     },
-    { title: "Cleanliness", lines: [`${CLEAN_LEVELS[a.clean - 1].label} standard`, `Dishes: ${label(DISHES, a.dishes)}`] },
+    { title: "Cleanliness", lines: [`${CLEAN_LEVELS[a.clean - 1].label} standard`] },
     {
       title: "Chores",
       lines: [
@@ -468,23 +468,13 @@ export function summary(h: Household, a: Answers) {
       title: "Food and Belongings",
       lines: [
         `Food: ${label(BORROWING, a.borrowing)}`,
-        `Personal items in common areas: up to ${label(ITEMS, a.items).toLowerCase()}`,
         `Joint items at move-out: ${label(JOINT, a.joint)}`,
-      ],
-    },
-    {
-      title: "Guests",
-      lines: [
-        `Overnight guest notice: ${label(GUEST_NOTICE, a.guestNotice)}`,
-        `Up to ${a.nights} consecutive night${a.nights === 1 ? "" : "s"}, ${label(CAPS, a.cap).toLowerCase()}`,
-        `Parties: ${label(PARTIES, a.parties)}`,
       ],
     },
     { title: "Quiet Hours", lines: [quiet, a.headphones ? "Headphones for media during quiet hours" : "Low volume during quiet hours"] },
     {
       title: "Damage",
       lines: [
-        `Report damage ${label(REPORT, a.report).toLowerCase()}`,
         `Unexplained damage: ${label(UNATTRIBUTED, a.unattributed)}`,
         `Renter's insurance: ${label(INSURANCE, a.insurance)}`,
         a.photos ? "Move-in photos required" : "No move-in photos",

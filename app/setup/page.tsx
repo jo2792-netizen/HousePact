@@ -87,7 +87,7 @@ function Onboarding() {
         <ol className="flex flex-col gap-4">
           {[
             ["Household Details", "The address, everyone's names, and the lease dates."],
-            ["Eight Quick Questions", "Cleanliness, chores, money, guests, quiet hours, and more."],
+            ["Seven Quick Questions", "Cleanliness, chores, money, quiet hours, and more."],
             ["Review and Sign", "Housepact writes a formal agreement. You sign here, and your roommates get an invite to sign."],
           ].map(([title, help], i) => (
             <li key={title} className="flex gap-4">
