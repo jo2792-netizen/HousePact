@@ -7,7 +7,7 @@ import { ApartmentArt } from "@/components/apartment-art";
 import { BillRow, Card, ChoreRow, EventRow, RentCard, SeeAll, Stat } from "@/components/cards";
 import { Icon, type IconName } from "@/components/icons";
 import { AddBill, AddChore, AddEvent } from "@/components/sheets";
-import { Select } from "@/components/ui";
+import { Dot } from "@/components/ui";
 import { DISHES, GUEST_NOTICE, PARTIES, clock, label, longDate } from "@/lib/agreement";
 import { allBills, debts, greeting, headsUp, isDone, money, rentStatus, time, upcoming, when } from "@/lib/house";
 import { reset, update, useHouse } from "@/lib/store";
@@ -15,6 +15,7 @@ import { reset, update, useHouse } from "@/lib/store";
 export default function Home() {
   const h = useHouse();
   const [copied, setCopied] = useState(false);
+  const [resent, setResent] = useState<number | null>(null); // which roommate's invite was just resent
   const [adding, setAdding] = useState<"Bill" | "Chore" | "Event" | null>(null);
   const photoInput = useRef<HTMLInputElement>(null);
   if (!h) return null;
@@ -83,10 +84,6 @@ export default function Home() {
           <h1>
             {greeting()}, {h.mates[h.me]}
           </h1>
-        </div>
-        <div className="w-full sm:w-56">
-          <p className="mb-1 text-subhead text-secondary">Viewing as</p>
-          <Select label="Viewing as" options={h.mates.map((name, i) => ({ value: i, label: name }))} value={h.me} onChange={(i) => update({ me: i })} />
         </div>
       </div>
 
@@ -166,7 +163,7 @@ export default function Home() {
         <Stat
           label="Agreement"
           value={`${signed} of ${h.mates.length} signed`}
-          sub={unsigned.length ? `Waiting on ${unsigned.join(", ")}` : "Fully executed"}
+          sub={unsigned.length ? `Invites out to ${unsigned.join(", ")}` : "Fully executed"}
           href="/pact"
         />
       </div>
@@ -199,6 +196,35 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col gap-6">
+          <Card title="Roommates" icon="users">
+            <ul className="divide-y divide-separator">
+              {h.mates.map((name, i) => (
+                <li key={i} className="flex min-h-14 items-center gap-4 py-2">
+                  <Dot name={name} />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">{i === h.me ? `${name} (You)` : household.names[i]}</p>
+                    <p className="truncate text-subhead text-secondary">
+                      {i === h.me ? "Set up the house" : signatures[i] ? "Joined · Signed the agreement" : `Invited · ${household.emails?.[i] ?? "Waiting to join"}`}
+                    </p>
+                  </div>
+                  {i !== h.me && !signatures[i] && (
+                    <button
+                      onClick={() => {
+                        setResent(i);
+                        setTimeout(() => setResent(null), 2500);
+                      }}
+                      className="link shrink-0 text-subhead"
+                      aria-label={`Resend invite to ${name}`}
+                    >
+                      <Icon name={resent === i ? "check" : "reset"} className="size-4" />
+                      {resent === i ? "Sent" : "Resend"}
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </Card>
+
           <Card title="Coming Up" icon="calendar" action={<SeeAll href="/calendar" />}>
             {events.length ? (
               <ul className="divide-y divide-separator">

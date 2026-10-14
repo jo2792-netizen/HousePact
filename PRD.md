@@ -13,12 +13,14 @@ Housepact is one simple place for a household's info, rules, chores, bills, and 
 - No landing page, no login, no database. Data is saved in the browser (localStorage) on one device.
 - Simple over complete: when in doubt, leave it out.
 
+**Point of view.** The app belongs to one person: the main tenant who sets up the house. Other roommates appear as invited members. You sign the agreement on your device; each invited roommate signs from their own phone, and you can resend their invites. You can only record payments that you made or received.
+
 ## Target User
 College students and young professionals sharing an apartment with 2–6 roommates.
 
 ## Features (simple version of each)
 
-**Setup.** The app opens on an onboarding flow: a welcome screen, household details (address, 2 to 6 roommate names, lease dates, effective date), eight questions, a review screen with an Edit link per section, and the generated agreement. "Open Household Dashboard" then opens Home, filled with realistic example info, chores, bills, and events. A small Reset starts onboarding over. For demos, the whole flow starts filled in with a realistic sample household and answers (address, names, rent split, every question, signatures, and examples in the Add forms), so it works with taps alone.
+**Setup.** The app opens on an onboarding flow: a welcome screen, household details (address, your name, 1 to 5 roommates to invite by email, lease dates, effective date), eight questions, a review screen with an Edit link per section, and the generated agreement. "Open Household Dashboard" then opens Home, filled with realistic example info, chores, bills, and events. A small Reset starts onboarding over. For demos, the whole flow starts filled in with a realistic sample household and answers (address, names, rent split, every question, signatures, and examples in the Add forms), so it works with taps alone.
 
 **Apartment Info.** WiFi (tap to copy), trash pickup days, super/HOA contacts, and emergency info (contacts, shutoff valve, breaker box).
 

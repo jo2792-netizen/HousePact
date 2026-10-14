@@ -18,5 +18,5 @@ Build everything below in one pass, keeping each feature as simple as possible. 
 - [x] Remove anything not in PRD.md
 
 ## Test (demo flow)
-- [x] Get Started → tap through the pre-filled steps → review → generate the agreement → everyone signs → Home → check off a chore → add a bill and see balances update → add a Lunch or Party that clashes with someone's interview or early night → Reset works
+- [x] Get Started → tap through the pre-filled steps → review → generate the agreement → you sign (roommates are invited) → Home → check off a chore → add a bill and see balances update → add a Lunch or Party that clashes with someone's interview or early night → Reset works
 - [x] Works on a phone-sized screen with no errors

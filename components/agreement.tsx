@@ -11,10 +11,11 @@ type Props = {
   signatures: (string | null)[]; // when each roommate signed, or null
   onSign: (i: number) => void;
   onUnsign: (i: number) => void;
+  me: number; // only you can sign on this device; everyone else is invited to sign on their own
 };
 
 /** The generated Residential Roommate Agreement, styled as a paper document. */
-export function AgreementDocument({ household, answers, signatures, onSign, onUnsign }: Props) {
+export function AgreementDocument({ household, answers, signatures, onSign, onUnsign, me }: Props) {
   const doc = buildAgreement(household, answers);
   const names = household.names;
   const signed = names.filter((_, i) => signatures[i]).length;
@@ -74,7 +75,14 @@ export function AgreementDocument({ household, answers, signatures, onSign, onUn
         </p>
         <div className="mt-6 grid gap-8 sm:grid-cols-2">
           {names.map((name, i) => (
-            <SignatureLine key={i} name={name} signedAt={signatures[i] ?? null} onSign={() => onSign(i)} onUnsign={() => onUnsign(i)} />
+            <SignatureLine
+              key={i}
+              name={name}
+              email={i === me ? undefined : household.emails?.[i]}
+              signedAt={signatures[i] ?? null}
+              onSign={() => onSign(i)}
+              onUnsign={() => onUnsign(i)}
+            />
           ))}
         </div>
         {executed && (
@@ -165,8 +173,19 @@ function DocTable({ table }: { table: Table }) {
 const clean = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
 
 /** One roommate's signature: type your name to sign; it then appears in a script font with a timestamp. */
-function SignatureLine({ name, signedAt, onSign, onUnsign }: { name: string; signedAt: string | null; onSign: () => void; onUnsign: () => void }) {
+/**
+ * One roommate's signature. Your own line has a type-to-sign box. An invited roommate's line
+ * (one with an email) shows that they're waiting to sign on their own phone, with a Resend Invite button.
+ */
+function SignatureLine({ name, email, signedAt, onSign, onUnsign }: {
+  name: string;
+  email?: string;
+  signedAt: string | null;
+  onSign: () => void;
+  onUnsign: () => void;
+}) {
   const [typed, setTyped] = useState(name); // pre-filled for the demo
+  const [resent, setResent] = useState(false);
   const matches = clean(typed) === clean(name);
 
   return (
@@ -184,7 +203,29 @@ function SignatureLine({ name, signedAt, onSign, onUnsign }: { name: string; sig
         {signedAt ? stamp(signedAt) : "____________________"}
       </p>
 
-      {signedAt ? (
+      {email && !signedAt ? (
+        <div className="mt-2 flex flex-col gap-2 font-sans print:hidden">
+          <p className="flex flex-wrap items-center gap-2 text-subhead text-secondary">
+            <span className="rounded-md bg-fill px-2 py-1 font-semibold">Invited</span>
+            {email} · Waiting to sign
+          </p>
+          <button
+            className="link self-start"
+            onClick={() => {
+              setResent(true);
+              setTimeout(() => setResent(false), 2500);
+            }}
+          >
+            <Icon name={resent ? "check" : "reset"} className="size-4" />
+            {resent ? "Invite Sent" : "Resend Invite"}
+          </button>
+        </div>
+      ) : email ? (
+        <p className="flex flex-wrap items-center gap-2 font-sans text-subhead text-secondary print:hidden">
+          <Icon name="check" className="size-4 text-success" />
+          Signed on their own device.
+        </p>
+      ) : signedAt ? (
         <p className="flex flex-wrap items-center gap-2 font-sans text-subhead text-secondary print:hidden">
           <Icon name="check" className="size-4 text-success" />
           Signed electronically.

@@ -63,10 +63,12 @@ export default function Bills() {
                       </p>
                       <span className={`text-title3 font-bold tabular-nums ${from === h.me ? "text-danger" : ""}`}>{money(amount)}</span>
                     </div>
-                    <button onClick={() => settle(from, to, amount)} className="btn-secondary h-11 w-auto self-end px-4 text-subhead">
-                      <Icon name="check" className="size-4" />
-                      Mark as Paid
-                    </button>
+                    {(from === h.me || to === h.me) && (
+                      <button onClick={() => settle(from, to, amount)} className="btn-secondary h-11 w-auto self-end px-4 text-subhead">
+                        <Icon name="check" className="size-4" />
+                        {from === h.me ? "Mark as Paid" : "Mark as Received"}
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

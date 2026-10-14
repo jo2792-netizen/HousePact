@@ -19,7 +19,7 @@ export default function Pact() {
       <div className="print:hidden">
         <PageHeader
           title="Agreement"
-          subtitle={signed === h.mates.length ? "Signed by everyone. This is your house's official agreement." : `${signed} of ${h.mates.length} roommates have signed. Anyone left can sign at the bottom.`}
+          subtitle={signed === h.mates.length ? "Signed by everyone. This is your house's official agreement." : `${signed} of ${h.mates.length} have signed. Invited roommates sign from their own phones; you can resend their invites below.`}
           action={
             <button className="btn w-auto" onClick={() => window.print()}>
               <Icon name="download" />
@@ -33,6 +33,7 @@ export default function Pact() {
           household={h.agreement.household}
           answers={h.agreement.answers}
           signatures={h.agreement.signatures}
+        me={h.me}
           onSign={(i) => sign(i, new Date().toISOString())}
           onUnsign={(i) => sign(i, null)}
         />

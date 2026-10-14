@@ -4,7 +4,8 @@
 
 export type Household = {
   address: string;
-  names: string[];
+  names: string[]; // the first name is you, the person setting up the house
+  emails?: string[]; // where each invited roommate's invite goes (not used in the agreement text)
   leaseStart: string; // YYYY-MM-DD
   leaseEnd: string;
   effective: string;
@@ -314,13 +315,15 @@ export const toYMD = (d: Date) =>
 // Pre-filled so the demo needs no typing; everything stays editable.
 export const SAMPLE_ADDRESS = "245 Bedford Avenue, Apt 4B, Brooklyn, NY 11211";
 export const SAMPLE_NAMES = ["Maya Chen", "Jordan Rivera", "Priya Patel", "Sam Okafor", "Alex Kim", "Taylor Brooks"];
+export const sampleEmail = (name: string) => `${name.toLowerCase().replace(/\s+/g, ".")}@example.com`;
 
 /** The sample address and four roommates; effective today; a 12-month lease starting the first of next month. */
 export function blankHousehold(): Household {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const end = new Date(start.getFullYear() + 1, start.getMonth(), 0);
-  return { address: SAMPLE_ADDRESS, names: SAMPLE_NAMES.slice(0, 4), leaseStart: toYMD(start), leaseEnd: toYMD(end), effective: toYMD(now) };
+  const names = SAMPLE_NAMES.slice(0, 4);
+  return { address: SAMPLE_ADDRESS, names, emails: names.map((n, i) => (i ? sampleEmail(n) : "")), leaseStart: toYMD(start), leaseEnd: toYMD(end), effective: toYMD(now) };
 }
 
 export function sampleDraft(): { household: Household; answers: Answers } {
@@ -435,7 +438,8 @@ export function summary(h: Household, a: Answers) {
       title: "Household",
       lines: [
         h.address,
-        joinNames(h.names),
+        `You: ${h.names[0]}`,
+        `Invited: ${joinNames(h.names.slice(1))}`,
         `Lease ${longDate(h.leaseStart)} to ${longDate(h.leaseEnd)}`,
         `Effective ${longDate(h.effective)}`,
       ],

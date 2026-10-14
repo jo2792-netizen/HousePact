@@ -43,7 +43,7 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
         {house && (
           <div className="px-2">
             <p className="font-semibold">{house.name}</p>
-            <p className="text-subhead text-secondary">{house.mates.length} roommates</p>
+            <p className="text-subhead text-secondary">You and {house.mates.length - 1} roommates</p>
           </div>
         )}
         <nav aria-label="Main" className="flex flex-col gap-1">

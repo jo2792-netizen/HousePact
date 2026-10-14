@@ -6,7 +6,7 @@ import { AgreementDocument } from "@/components/agreement";
 import { Icon } from "@/components/icons";
 import { QUESTIONS } from "@/components/questions";
 import { BackButton, Field, NavBar } from "@/components/ui";
-import { SAMPLE_NAMES, fitAnswers, longDate, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
+import { SAMPLE_NAMES, fitAnswers, joinNames, sampleEmail, longDate, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
 import { newHouse } from "@/lib/house";
 import { canUndoReset, save, undoReset, useHouse } from "@/lib/store";
 
@@ -37,6 +37,12 @@ function Onboarding() {
   const [signatures, setSignatures] = useState<(string | null)[]>([]);
   const [fromReview, setFromReview] = useState(false); // editing one section from Review returns to Review
   const names = household.names;
+  const emails = household.emails ?? [];
+  const setName = (i: number, value: string) => changeHousehold({ names: names.map((n, j) => (j === i ? value : n)) });
+  const addRoommate = () => {
+    const name = SAMPLE_NAMES.find((n) => !names.includes(n)) ?? "";
+    changeHousehold({ names: [...names, name], emails: [...names.map((_, j) => emails[j] ?? ""), name ? sampleEmail(name) : ""] });
+  };
 
   // Changing any term clears signatures, since everyone signed the earlier version
   const changeHousehold = (changes: Partial<Household>) => {
@@ -82,7 +88,7 @@ function Onboarding() {
           {[
             ["Household Details", "The address, everyone's names, and the lease dates."],
             ["Eight Quick Questions", "Cleanliness, chores, money, guests, quiet hours, and more."],
-            ["Review and Sign", "Housepact writes a formal agreement that everyone signs."],
+            ["Review and Sign", "Housepact writes a formal agreement. You sign here, and your roommates get an invite to sign."],
           ].map(([title, help], i) => (
             <li key={title} className="flex gap-4">
               <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-full bg-fill font-semibold text-secondary">
@@ -114,7 +120,9 @@ function Onboarding() {
     const problem = !household.address.trim()
       ? "The address is missing. Enter the home's street address to continue."
       : names.some((n) => !n.trim())
-        ? "A roommate's name is blank. Enter each person's full name, or remove the empty row."
+        ? "A name is blank. Enter each person's full name, or remove the empty row."
+        : names.slice(1).some((_, k) => !/^\S+@\S+\.\S+$/.test(emails[k + 1] ?? ""))
+          ? "An invite email is missing or incomplete. Enter a full email address for each roommate so their invite can be sent."
         : new Set(names.map((n) => n.trim().toLowerCase())).size < names.length
           ? "Two roommates have the same name. Give each person a different name, such as adding a last initial."
           : !(household.leaseStart && household.leaseEnd && household.effective)
@@ -138,29 +146,39 @@ function Onboarding() {
             onChange={(e) => changeHousehold({ address: e.target.value })}
           />
         </Field>
-        <Field label="Roommates" help="Full names, as they should appear on the agreement. Two to six people.">
-          {names.map((name, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input
-                className="field"
-                aria-label={`Roommate ${i + 1}`}
-                placeholder={`Roommate ${i + 1}`}
-                value={name}
-                onChange={(e) => changeHousehold({ names: names.map((n, j) => (j === i ? e.target.value : n)) })}
-              />
-              {names.length > 2 && (
-                <button
-                  aria-label={`Remove roommate ${i + 1}${name ? `, ${name}` : ""}`}
-                  className="flex size-11 shrink-0 items-center justify-center rounded-xl text-secondary hover:bg-fill"
-                  onClick={() => changeHousehold({ names: names.filter((_, j) => j !== i) })}
-                >
-                  <Icon name="xmark" />
-                </button>
-              )}
-            </div>
-          ))}
+        <Field label="You" help="You're setting up the house. You'll be the first name on the agreement.">
+          <input className="field" aria-label="Your name" value={names[0]} onChange={(e) => setName(0, e.target.value)} />
+        </Field>
+        <Field label="Invite Your Roommates" help="Each roommate gets an email invite to join the house and sign the agreement on their own phone. One to five people.">
+          {names.slice(1).map((name, k) => {
+            const i = k + 1;
+            return (
+              <div key={i} className="flex flex-col gap-2 rounded-xl bg-surface p-4">
+                <div className="flex items-center gap-2">
+                  <input className="field" aria-label={`Roommate ${i} name`} placeholder="Full name" value={name} onChange={(e) => setName(i, e.target.value)} />
+                  {names.length > 2 && (
+                    <button
+                      aria-label={`Remove ${name || `roommate ${i}`}`}
+                      className="flex size-11 shrink-0 items-center justify-center rounded-xl text-secondary hover:bg-fill"
+                      onClick={() => changeHousehold({ names: names.filter((_, j) => j !== i), emails: emails.filter((_, j) => j !== i) })}
+                    >
+                      <Icon name="xmark" />
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="email"
+                  className="field"
+                  aria-label={`Roommate ${i} email`}
+                  placeholder="Email for the invite"
+                  value={emails[i] ?? ""}
+                  onChange={(e) => changeHousehold({ emails: names.map((_, j) => (j === i ? e.target.value : emails[j] ?? "")) })}
+                />
+              </div>
+            );
+          })}
           {names.length < 6 && (
-            <button className="link self-start" onClick={() => changeHousehold({ names: [...names, SAMPLE_NAMES.find((n) => !names.includes(n)) ?? ""] })}>
+            <button className="link self-start" onClick={addRoommate}>
               <Icon name="plus" />
               Add Roommate
             </button>
@@ -229,6 +247,13 @@ function Onboarding() {
     <>
       <NavBar left={<BackButton onClick={() => go(REVIEW)} label="Edit Answers" />} />
       <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pt-6 pb-[max(2rem,env(safe-area-inset-bottom))] print:max-w-none print:p-0">
+        <p role="status" className="flex gap-2 rounded-xl bg-surface p-4 text-subhead print:hidden">
+          <Icon name="check" className="mt-0.5 size-4 shrink-0 text-success" />
+          <span>
+            <span className="font-semibold">Invites sent to {joinNames(names.slice(1).map((n) => n.split(" ")[0]))}.</span>{" "}
+            <span className="text-secondary">They&apos;ll each review and sign from their own phone. Sign below to add your signature.</span>
+          </span>
+        </p>
         <div className="flex flex-wrap gap-2 print:hidden">
           <button className="btn-secondary w-auto" onClick={() => window.print()}>
             <Icon name="download" />
@@ -243,6 +268,7 @@ function Onboarding() {
           household={household}
           answers={answers}
           signatures={signatures}
+          me={0}
           onSign={(i) => sign(i, new Date().toISOString())}
           onUnsign={(i) => sign(i, null)}
         />
@@ -250,7 +276,7 @@ function Onboarding() {
           <button className="btn" onClick={() => save(newHouse({ household, answers, signatures: names.map((_, j) => signatures[j] ?? null) }))}>
             Open Household Dashboard
           </button>
-          <p className="text-center text-subhead text-secondary">Anyone who hasn&apos;t signed can sign later from the dashboard.</p>
+          <p className="text-center text-subhead text-secondary">Your dashboard shows who has signed and lets you resend invites.</p>
         </div>
       </main>
     </>
