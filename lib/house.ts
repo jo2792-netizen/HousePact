@@ -9,9 +9,30 @@ export const EMOJI: Record<string, string> = {
   Repairs: "🔧",
   Furniture: "🛋️",
   Housepact: "🏠",
-  Quiet: "🤫",
-  Hosting: "🎉",
 };
+
+// Calendar event types. "quiet" events clash with "busy" ones that overlap them.
+export type Mood = "quiet" | "busy" | "info";
+export const MOODS: Record<Mood, string> = { quiet: "Needs quiet", busy: "Busy house", info: "Heads-up" };
+export const EVENTS: Record<string, { emoji: string; mood: Mood; from: string; to: string }> = {
+  Interview: { emoji: "💼", mood: "quiet", from: "10:00", to: "11:00" },
+  "Study session": { emoji: "📚", mood: "quiet", from: "14:00", to: "18:00" },
+  "Work call": { emoji: "💻", mood: "quiet", from: "09:00", to: "10:00" },
+  "Early night": { emoji: "😴", mood: "quiet", from: "22:00", to: "07:00" },
+  "Quiet time": { emoji: "🤫", mood: "quiet", from: "23:00", to: "07:00" },
+  Party: { emoji: "🎉", mood: "busy", from: "20:00", to: "23:00" },
+  Dinner: { emoji: "🍽️", mood: "busy", from: "19:00", to: "21:00" },
+  Breakfast: { emoji: "🥞", mood: "busy", from: "09:00", to: "10:30" },
+  Lunch: { emoji: "🥪", mood: "busy", from: "12:00", to: "13:30" },
+  "Club meeting": { emoji: "👥", mood: "busy", from: "18:00", to: "20:00" },
+  "Game night": { emoji: "🎮", mood: "busy", from: "20:00", to: "23:00" },
+  "Overnight guest": { emoji: "🛏️", mood: "busy", from: "20:00", to: "10:00" },
+  "Repair visit": { emoji: "🔧", mood: "busy", from: "09:00", to: "12:00" },
+  "House meeting": { emoji: "🏠", mood: "info", from: "19:00", to: "20:00" },
+  Away: { emoji: "🧳", mood: "info", from: "09:00", to: "21:00" },
+  Delivery: { emoji: "📦", mood: "info", from: "12:00", to: "16:00" },
+};
+const OPPOSITE: Record<Mood, Mood | null> = { quiet: "busy", busy: "quiet", info: null };
 const PRICE = 8; // Housepact subscription per house, per month
 
 // Pact quiz: one question per topic. The picked answer fills in the {} of the rule.
@@ -75,12 +96,18 @@ export function debts(house: House) {
 export const upcoming = (events: CalEvent[]) =>
   events.filter((e) => e.end > new Date().toISOString()).sort((a, b) => a.start.localeCompare(b.start));
 
-/** Quiet time and hosting can't overlap. */
-export const clashes = (event: CalEvent, events: CalEvent[]) =>
-  events.some((e) => e.kind !== event.kind && e.start < event.end && event.start < e.end);
+/** The event this one clashes with, if any: something that needs quiet overlapping a busy house. */
+export const clashWith = (event: CalEvent, events: CalEvent[]) =>
+  events.find((e) => EVENTS[e.kind].mood === OPPOSITE[EVENTS[event.kind].mood] && e.start < event.end && event.start < e.end);
+
+/** The next event in the coming day that needs quiet, so the house gets a heads-up. */
+export const headsUp = (events: CalEvent[]) =>
+  upcoming(events).find(
+    (e) => EVENTS[e.kind].mood === "quiet" && e.start < new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  );
 
 export function googleCalendarLink(event: CalEvent, houseName: string) {
-  const title = `${event.note || (event.kind === "Quiet" ? "Quiet time" : "Hosting")} · ${houseName}`;
+  const title = `${EVENTS[event.kind].emoji} ${event.note || event.kind} · ${houseName}`;
   const utc = (iso: string) => iso.replace(/[-:]|\.\d+/g, ""); // 20261015T180000Z
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${utc(event.start)}/${utc(event.end)}`;
 }
@@ -102,6 +129,10 @@ export function newHouse(name: string, mates: string[], answers: number[], agree
     new Date(now.getFullYear(), now.getMonth(), now.getDate() + days, hour).toISOString();
   const moveIn = new Date(now.getFullYear(), now.getMonth() - 1, 1, 9).toISOString();
   const m = (i: number) => i % mates.length; // works for any number of roommates
+  // The example interview is about 2 hours from now, kept to daytime (otherwise tomorrow at 10am)
+  const soon = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 2);
+  if (soon.getHours() > 18) soon.setDate(soon.getDate() + 1);
+  if (soon.getHours() > 18 || soon.getHours() < 9) soon.setHours(10);
 
   return {
     name,
@@ -139,9 +170,14 @@ export function newHouse(name: string, mates: string[], answers: number[], agree
       { amount: 31.6, paidBy: m(0), category: "Groceries", note: "Paper towels & dish soap", at: at(-2) },
     ],
     events: [
-      { kind: "Quiet", start: at(0, 22), end: at(1, 7), by: m(3), note: "Early exam tomorrow" },
-      { kind: "Quiet", start: at(2, 14), end: at(2, 18), by: m(2), note: "Study session" },
-      { kind: "Hosting", start: at(4, 19), end: at(4, 23), by: m(1), note: "Birthday dinner" },
+      { kind: "Interview", start: soon.toISOString(), end: new Date(soon.getTime() + 60 * 60 * 1000).toISOString(), by: m(3), note: "Video interview for a summer internship" },
+      { kind: "Early night", start: at(0, 22), end: at(1, 7), by: m(2), note: "Early exam tomorrow" },
+      { kind: "Repair visit", start: at(1, 13), end: at(1, 16), by: m(0), note: "Super is fixing the bathroom fan" },
+      { kind: "Study session", start: at(2, 14), end: at(2, 18), by: m(2), note: "Midterm prep" },
+      { kind: "Club meeting", start: at(3, 18), end: at(3, 20), by: m(1), note: "Photography club" },
+      { kind: "Dinner", start: at(4, 19), end: at(4, 21), by: m(1), note: "Birthday dinner with friends" },
+      { kind: "Away", start: at(5, 9), end: at(7, 21), by: m(3), note: "Visiting family for the weekend" },
+      { kind: "Breakfast", start: at(6, 10), end: at(6, 12), by: m(0), note: "Pancakes for the house" },
     ],
   };
 }

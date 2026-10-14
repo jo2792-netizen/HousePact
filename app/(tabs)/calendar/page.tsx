@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Choice, Dot, Field, Sheet } from "@/components/ui";
-import { EMOJI, clashes, day, googleCalendarLink, time, upcoming } from "@/lib/house";
-import { update, useHouse, type CalEvent, type House } from "@/lib/store";
+import { EVENTS, MOODS, clashWith, day, googleCalendarLink, time, upcoming, type Mood } from "@/lib/house";
+import { update, useHouse, type House } from "@/lib/store";
 
-const DEFAULT_TIMES = { Quiet: ["23:00", "07:00"], Hosting: ["20:00", "23:00"] };
+const DAY = 24 * 60 * 60 * 1000;
 
 export default function Calendar() {
   const h = useHouse();
@@ -20,20 +20,28 @@ export default function Calendar() {
       {!events.length && <p className="text-muted">Nothing planned</p>}
       <ul className="flex flex-col gap-3">
         {events.map((e, i) => {
-          const clash = clashes(e, events);
+          const type = EVENTS[e.kind];
+          const clash = clashWith(e, events);
+          // Multi-day events (like being away) show a date range instead of times
+          const long = new Date(e.end).getTime() - new Date(e.start).getTime() > DAY;
           return (
             <li key={i} className={`card flex flex-col gap-1 border-2 ${clash ? "border-alert" : "border-transparent"}`}>
               <div className="flex items-center justify-between gap-3">
                 <p className="font-semibold">
-                  {EMOJI[e.kind]} {e.kind}
+                  {type.emoji} {e.kind}
                 </p>
                 <Dot i={e.by} name={h.mates[e.by]} />
               </div>
               {e.note && <p>{e.note}</p>}
               <p className="text-muted">
-                {day(e.start)} · {time(e.start)}–{time(e.end)}
+                {long ? `${day(e.start)} – ${day(e.end)}` : `${day(e.start)} · ${time(e.start)}–${time(e.end)}`}
+                {type.mood !== "info" && ` · ${MOODS[type.mood]}`}
               </p>
-              {clash && <p className="font-semibold text-alert">⚠️ Overlaps {e.kind === "Quiet" ? "hosting" : "quiet time"}</p>}
+              {clash && (
+                <p className="font-semibold text-alert">
+                  ⚠️ Clashes with {clash.by === h.me ? "your" : `${h.mates[clash.by]}'s`} {clash.kind.toLowerCase()}
+                </p>
+              )}
               <a href={googleCalendarLink(e, h.name)} target="_blank" rel="noreferrer" className="self-start py-2 text-[15px] underline">
                 Add to Google Calendar
               </a>
@@ -50,16 +58,17 @@ export default function Calendar() {
 }
 
 function AddEvent({ h, onClose }: { h: House; onClose: () => void }) {
-  const [kind, setKind] = useState<CalEvent["kind"]>("Quiet");
+  const [kind, setKind] = useState("Interview");
   const [date, setDate] = useState(today);
-  const [from, setFrom] = useState(DEFAULT_TIMES.Quiet[0]);
-  const [to, setTo] = useState(DEFAULT_TIMES.Quiet[1]);
+  const [from, setFrom] = useState(EVENTS.Interview.from);
+  const [to, setTo] = useState(EVENTS.Interview.to);
   const [note, setNote] = useState("");
 
-  const pickKind = (k: CalEvent["kind"]) => {
+  // Picking a type fills in its usual times
+  const pickKind = (k: string) => {
     setKind(k);
-    setFrom(DEFAULT_TIMES[k][0]);
-    setTo(DEFAULT_TIMES[k][1]);
+    setFrom(EVENTS[k].from);
+    setTo(EVENTS[k].to);
   };
 
   const save = () => {
@@ -71,14 +80,20 @@ function AddEvent({ h, onClose }: { h: House; onClose: () => void }) {
 
   return (
     <Sheet title="Add event" canSave={!!(date && from && to)} onSave={save} onClose={onClose}>
-      <div className="grid grid-cols-2 gap-2">
-        {(["Quiet", "Hosting"] as const).map((k) => (
-          <Choice key={k} on={kind === k} onClick={() => pickKind(k)}>
-            {EMOJI[k]} {k}
-          </Choice>
-        ))}
-      </div>
-      <input className="field" placeholder="What's happening? (optional)" aria-label="What's happening" value={note} onChange={(e) => setNote(e.target.value)} />
+      {(Object.keys(MOODS) as Mood[]).map((mood) => (
+        <Field key={mood} label={MOODS[mood]}>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(EVENTS)
+              .filter(([, type]) => type.mood === mood)
+              .map(([k, type]) => (
+                <Choice key={k} on={kind === k} onClick={() => pickKind(k)}>
+                  {type.emoji} {k}
+                </Choice>
+              ))}
+          </div>
+        </Field>
+      ))}
+      <input className="field" placeholder="Details (optional)" aria-label="Details" value={note} onChange={(e) => setNote(e.target.value)} />
       <Field label="Day">
         <input type="date" aria-label="Day" className="field" value={date} onChange={(e) => setDate(e.target.value)} />
       </Field>

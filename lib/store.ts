@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 
 export type Chore = { name: string; who: number; often: "Daily" | "Weekly"; doneBy?: number; doneAt?: string };
 export type Bill = { amount: number; paidBy: number; category: string; at: string; note?: string };
-export type CalEvent = { kind: "Quiet" | "Hosting"; start: string; end: string; by: number; note?: string };
+export type CalEvent = { kind: string; start: string; end: string; by: number; note?: string };
 
 export type House = {
   name: string;
@@ -19,7 +19,7 @@ export type House = {
   events: CalEvent[];
 };
 
-const KEY = "housepact-v2"; // change when the data shape changes, so old saves are ignored
+const KEY = "housepact-v3"; // change when the data shape changes, so old saves are ignored
 const listeners = new Set<() => void>();
 let current: House | null | undefined; // undefined = not read yet
 let beforeReset: House | null = null;

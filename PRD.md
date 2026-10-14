@@ -30,7 +30,7 @@ College students and young professionals sharing an apartment with 2–6 roommat
 
 **Bills.** Add an expense with an amount, who paid, and a category (repairs, groceries & household, utilities, appliances & furniture). Split equally. Shows who owes whom. The Housepact subscription is included automatically as a monthly shared bill.
 
-**House Calendar.** Add Quiet Time or Hosting events. A warning appears if they overlap. Each event has an "Add to Google Calendar" link.
+**House Calendar.** Add events from a list of everyday types, grouped as "Needs quiet" (interview, study session, work call, early night, quiet time), "Busy house" (party, breakfast, lunch, dinner, club meeting, game night, overnight guest, repair visit), and "Heads-up" (house meeting, away, delivery). A warning appears when something that needs quiet overlaps a busy-house event, and Home gives a heads-up when someone needs quiet in the next day (e.g. "Priya has an interview"). Each event has an "Add to Google Calendar" link.
 
 ## Not in the MVP
 Accounts and syncing across devices, full Google Calendar sync, real payments, custom bill splits, chore rotation, photos, and notifications.

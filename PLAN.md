@@ -10,7 +10,7 @@ Build everything below in one pass, keeping each feature as simple as possible. 
 - [x] Pact: short quiz → agreement template → each roommate taps to agree
 - [x] Chores: add, assign, set frequency, check off (logs who and when)
 - [x] Bills: add expense, split equally, show who owes whom, Housepact subscription included
-- [x] Calendar: Quiet Time and Hosting events, overlap warning, "Add to Google Calendar" link
+- [x] Calendar: many event types (Needs quiet / Busy house / Heads-up), clash warning, Home heads-up, "Add to Google Calendar" link
 - [x] Realistic example data on the new house, so every tab has something to show
 
 ## Simplify
@@ -18,5 +18,5 @@ Build everything below in one pass, keeping each feature as simple as possible. 
 - [x] Remove anything not in PRD.md
 
 ## Test (demo flow)
-- [x] Get started → add roommates → take the quiz → everyone agrees → Home → check off a chore → add a bill and see balances update → add a Hosting event that conflicts with Quiet Time → Reset works
+- [x] Get started → add roommates → take the quiz → everyone agrees → Home → check off a chore → add a bill and see balances update → add a Lunch or Party that clashes with someone's interview or early night → Reset works
 - [x] Works on a phone-sized screen with no errors

@@ -123,7 +123,7 @@ export function Sheet({ title, canSave, onSave, onClose, children }: {
           onSave();
           onClose();
         }}
-        className="flex w-full max-w-md animate-slide-up flex-col gap-5 rounded-t-2xl bg-white p-6 pb-8"
+        className="flex max-h-[90dvh] w-full max-w-md animate-slide-up flex-col gap-5 overflow-y-auto rounded-t-2xl bg-white p-6 pb-8"
       >
         <div className="flex items-center justify-between">
           <h2>{title}</h2>

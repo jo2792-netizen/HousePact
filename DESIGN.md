@@ -51,7 +51,7 @@ Home                      Pact (quiz)
 - **Pact:** One question per screen, then the sticky note. Tap a dot to agree.
 - **Chores:** List with an assignee dot and a big round checkbox. Done items move to the bottom.
 - **Bills:** Balances in large type at the top, expenses below. "Add bill" opens one sheet: amount, paid by, category, Save.
-- **Calendar:** A simple upcoming list (not a month grid). 🤫 Quiet / 🎉 Hosting, with a red warning on conflicts.
+- **Calendar:** A simple upcoming list (not a month grid). Event types are emoji chips (💼 Interview, 🎉 Party, 🍽️ Dinner…) grouped as Needs quiet / Busy house / Heads-up, with a red warning on conflicts.
 
 ## Quality
 - Instant feedback on every tap.
