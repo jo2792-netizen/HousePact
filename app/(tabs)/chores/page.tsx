@@ -37,9 +37,9 @@ export default function Chores() {
         <Stat label="Done" value={String(done.length)} sub="This period" />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="flex flex-col gap-6">
         {sections.map((s) => (
-          <Card key={s.title} title={s.title} icon="chores" className={s.title === "Done" ? "lg:col-span-2" : ""}>
+          <Card key={s.title} title={s.title} icon="chores">
             {s.items.length ? (
               <ul className="divide-y divide-separator">
                 {s.items.map(({ i }) => (

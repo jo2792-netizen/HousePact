@@ -58,7 +58,7 @@ function Onboarding() {
 
   const go = (s: number) => {
     setScreen(s);
-    window.scrollTo(0, 0);
+    document.getElementById("screen")?.scrollTo(0, 0); // the scrolling area inside the phone frame
   };
   const edit = (s: number) => {
     setFromReview(true);
@@ -289,7 +289,7 @@ function Page({ children, left, right }: { children: ReactNode; left?: ReactNode
   return (
     <>
       <NavBar left={left} right={right} />
-      <main className="mx-auto flex min-h-[calc(100dvh-3rem)] max-w-xl flex-col gap-6 px-4 pt-6 pb-[max(2rem,env(safe-area-inset-bottom))]">{children}</main>
+      <main className="mx-auto flex min-h-[calc(100%-3.5rem)] max-w-xl flex-col gap-6 px-4 pt-6 pb-[max(2rem,env(safe-area-inset-bottom))]">{children}</main>
     </>
   );
 }

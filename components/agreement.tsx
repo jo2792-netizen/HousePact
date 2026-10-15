@@ -22,13 +22,13 @@ export function AgreementDocument({ household, answers, signatures, onSign, onUn
   const executed = signed === names.length;
 
   return (
-    <article className="rounded-2xl bg-surface px-4 py-8 font-serif text-callout leading-relaxed text-label lining-nums sm:px-12 sm:py-12 print:rounded-none print:p-0">
+    <article className="rounded-2xl bg-surface px-4 py-8 font-serif text-callout leading-relaxed text-label lining-nums print:rounded-none print:p-0">
       {/* Header */}
       <header className="flex flex-col items-center gap-4 border-b-2 border-label pb-6 text-center">
         <div className="font-sans">
           <Logo size="lg" />
         </div>
-        <h1 className="font-serif text-title2 font-semibold tracking-wide uppercase sm:text-title1">Residential Roommate Agreement</h1>
+        <h1 className="font-serif text-title2 font-semibold tracking-wide uppercase">Residential Roommate Agreement</h1>
         <dl className="grid grid-cols-[auto_auto] gap-x-4 text-subhead">
           <dt className="text-right text-secondary">Agreement No.</dt>
           <dd className="text-left">{doc.id}</dd>
@@ -42,7 +42,7 @@ export function AgreementDocument({ household, answers, signatures, onSign, onUn
       {/* Preamble */}
       <section className="mt-8 flex flex-col gap-4">
         {doc.preamble.map((p) => (
-          <p key={p} className="sm:text-justify">
+          <p key={p}>
             {p}
           </p>
         ))}
@@ -69,11 +69,11 @@ export function AgreementDocument({ household, answers, signatures, onSign, onUn
       {/* Signatures */}
       <section className="mt-12 break-inside-avoid">
         <h2 className="mb-4 text-center font-serif text-body font-semibold tracking-wide uppercase">Signatures</h2>
-        <p className="sm:text-justify">
+        <p>
           IN WITNESS WHEREOF, the Roommates have signed this Agreement, effective as of the Effective Date, on the dates written
           below.
         </p>
-        <div className="mt-6 grid gap-8 sm:grid-cols-2">
+        <div className="mt-6 grid gap-8">
           {names.map((name, i) => (
             <SignatureLine
               key={i}
@@ -107,7 +107,7 @@ export function AgreementDocument({ household, answers, signatures, onSign, onUn
 function DocBlock({ block, lead }: { block: Block; lead?: string }) {
   if ("p" in block) {
     return (
-      <p className="sm:text-justify">
+      <p>
         {lead && <strong className="font-semibold">{lead} </strong>}
         {block.p}
       </p>
@@ -117,7 +117,7 @@ function DocBlock({ block, lead }: { block: Block; lead?: string }) {
     return (
       <ol className="flex flex-col gap-2 pl-8">
         {block.list.map((item, i) => (
-          <li key={i} className="sm:text-justify">
+          <li key={i}>
             <span className="-ml-8 inline-block w-8">({String.fromCharCode(97 + i)})</span>
             {item}
           </li>
@@ -136,7 +136,7 @@ function DocTable({ table }: { table: Table }) {
         <thead>
           <tr>
             {table.head.map((h) => (
-              <th key={h} className="border border-secondary bg-fill p-2 text-left font-semibold sm:px-4 print:bg-transparent">
+              <th key={h} className="border border-secondary bg-fill p-2 text-left font-semibold print:bg-transparent">
                 {h}
               </th>
             ))}
@@ -146,7 +146,7 @@ function DocTable({ table }: { table: Table }) {
           {table.rows.map((row, r) => (
             <tr key={r}>
               {row.map((cell, c) => (
-                <td key={c} className={`border border-secondary p-2 align-top sm:px-4 ${/^\$|%$/.test(cell) ? "text-right tabular-nums" : ""}`}>
+                <td key={c} className={`border border-secondary p-2 align-top ${/^\$|%$/.test(cell) ? "text-right tabular-nums" : ""}`}>
                   {cell}
                 </td>
               ))}
@@ -157,7 +157,7 @@ function DocTable({ table }: { table: Table }) {
           <tfoot>
             <tr>
               {table.foot.map((cell, c) => (
-                <td key={c} className={`border border-secondary p-2 font-semibold sm:px-4 ${c > 0 ? "text-right tabular-nums" : ""}`}>
+                <td key={c} className={`border border-secondary p-2 font-semibold ${c > 0 ? "text-right tabular-nums" : ""}`}>
                   {cell}
                 </td>
               ))}

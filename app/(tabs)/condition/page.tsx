@@ -50,15 +50,7 @@ export default function Condition() {
       <PageHeader
         title="Condition"
         subtitle="Before photos, what needs fixing, and what it costs. Repair costs go straight to Bills."
-        action={
-          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
-            <button className="btn-secondary sm:w-auto" onClick={() => setAdding(true)}>
-              <Icon name="camera" />
-              Add Note
-            </button>
-            <AddButton label="Report Repair" onClick={() => setReporting(true)} />
-          </div>
-        }
+        action={<AddButton label="Report Repair" onClick={() => setReporting(true)} />}
       />
 
       {h.agreement.answers.photos && (
@@ -76,7 +68,7 @@ export default function Condition() {
 
       <Card title="Before Photos" icon="image" action={<span className="text-subhead text-secondary">Move-in, {longDate(toYMD(new Date(h.since)))}</span>}>
         {before.length ? (
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-4">
             {before.map((p, i) => (
               <li key={i}>
                 <button onClick={() => setViewing(p)} className="block w-full text-left" aria-label={`View photo: ${p.caption}`}>
@@ -112,8 +104,11 @@ export default function Condition() {
         ))}
       </section>
 
-      <h2 className="mt-2">Notes by Room</h2>
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="mt-2 flex items-center justify-between gap-4">
+        <h2>Notes by Room</h2>
+        <AddButton label="Add Note" icon="camera" onClick={() => setAdding(true)} />
+      </div>
+      <div className="flex flex-col gap-6">
         {byRoom.map(({ room, notes }) => (
           <Card key={room} title={room} icon="home">
             <ul className="divide-y divide-separator">
@@ -193,7 +188,7 @@ function RepairRow({ h, r, onAddCost }: { h: House; r: Repair; onAddCost: () => 
   const next = STATUSES[STATUSES.indexOf(r.status) + 1]; // Reported, then Scheduled, In Progress, Fixed
 
   return (
-    <li className="flex flex-col gap-4 py-4 sm:flex-row sm:items-start">
+    <li className="flex flex-col gap-4 py-4">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="font-semibold">{r.title}</p>
         <p className="text-subhead text-secondary">
@@ -236,9 +231,9 @@ function RepairRow({ h, r, onAddCost }: { h: House; r: Repair; onAddCost: () => 
       </div>
 
       {/* Status: icon and label, plus one button for the next step */}
-      <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+      <div className="flex shrink-0 flex-col gap-2">
         <span
-          className={`inline-flex items-center gap-1 self-start rounded-md sm:self-end px-2 py-1 text-subhead font-semibold ${r.status === "Fixed" ? "bg-success-wash text-success" : "bg-fill text-secondary"}`}
+          className={`inline-flex items-center gap-1 self-start rounded-md px-2 py-1 text-subhead font-semibold ${r.status === "Fixed" ? "bg-success-wash text-success" : "bg-fill text-secondary"}`}
         >
           <Icon name={STATUS_ICON[r.status]} className="size-4" />
           {r.status}

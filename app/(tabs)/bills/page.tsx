@@ -38,7 +38,7 @@ export default function Bills() {
         action={<AddButton label="Add Bill" onClick={() => setAdding(true)} />}
       />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4">
         <Stat label="Spent this month" value={money(spent)} sub="Shared costs, not rent" />
         <Stat label="Your share this month" value={money(spent / h.mates.length)} sub={`One of ${h.mates.length} equal shares`} />
         {iOwe ? (
@@ -48,8 +48,8 @@ export default function Bills() {
         )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="flex flex-col gap-6 lg:col-span-2">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <Card title="Balances" icon="users">
             {owed.length ? (
               <ul className="divide-y divide-separator">
@@ -79,7 +79,7 @@ export default function Bills() {
           <RentCard h={h} />
         </div>
 
-        <Card title="Expenses" icon="bills" className="lg:col-span-3">
+        <Card title="Expenses" icon="bills">
           {[...months].map(([month, bills]) => (
             <div key={month} className="mt-4 first:mt-0">
               <h3 className="flex justify-between border-b border-separator py-2 text-subhead font-semibold text-secondary">

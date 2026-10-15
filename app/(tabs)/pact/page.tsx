@@ -21,9 +21,13 @@ export default function Pact() {
           title="Agreement"
           subtitle={signed === h.mates.length ? "Signed by everyone. This is your house's official agreement." : `${signed} of ${h.mates.length} have signed. Invited roommates sign from their own phones; you can resend their invites below.`}
           action={
-            <button className="btn w-auto" onClick={() => window.print()}>
-              <Icon name="download" />
-              Download as PDF
+            <button
+              aria-label="Download as PDF"
+              title="Download as PDF"
+              className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent"
+              onClick={() => window.print()}
+            >
+              <Icon name="download" className="size-6" />
             </button>
           }
         />

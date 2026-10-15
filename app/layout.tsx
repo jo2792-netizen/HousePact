@@ -22,7 +22,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${serif.variable} ${script.variable}`}>
-      <body>{children}</body>
+      <body>
+        {/* The app lives inside a phone frame; on an actual phone the frame fills the screen */}
+        <div className="phone">
+          <div id="screen" className="screen">
+            {children}
+          </div>
+        </div>
+      </body>
     </html>
   );
 }

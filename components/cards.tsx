@@ -14,21 +14,21 @@ const shortDate = (d: Date) => d.toLocaleDateString("en-US", { weekday: "short",
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <div className="min-w-0">
-        <h1>{title}</h1>
-        {subtitle && <p className="mt-1 text-secondary">{subtitle}</p>}
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="min-w-0">{title}</h1>
+        {action}
       </div>
-      {action}
+      {subtitle && <p className="text-secondary">{subtitle}</p>}
     </div>
   );
 }
 
-export function AddButton({ label, onClick }: { label: string; onClick: () => void }) {
+/** The round gold "+" next to a screen's title. Its label is read aloud by screen readers. */
+export function AddButton({ label, onClick, icon = "plus" }: { label: string; onClick: () => void; icon?: IconName }) {
   return (
-    <button className="btn w-auto" onClick={onClick}>
-      <Icon name="plus" />
-      {label}
+    <button aria-label={label} title={label} className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent" onClick={onClick}>
+      <Icon name={icon} className="size-6" />
     </button>
   );
 }

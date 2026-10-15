@@ -112,7 +112,7 @@ export function Sheet({ title, action, canSave, onSave, onClose, children }: {
   children: ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 md:items-center md:p-8" onClick={onClose}>
+    <div className="fixed inset-0 z-30 flex items-end bg-black/40" onClick={onClose}>
       <form
         role="dialog"
         aria-modal="true"
@@ -123,7 +123,7 @@ export function Sheet({ title, action, canSave, onSave, onClose, children }: {
           onSave();
           onClose();
         }}
-        className="flex max-h-[90dvh] w-full max-w-md animate-sheet flex-col overflow-y-auto rounded-t-2xl bg-surface pb-[max(1.5rem,env(safe-area-inset-bottom))] md:rounded-2xl md:pb-6"
+        className="flex max-h-[90%] w-full animate-sheet flex-col overflow-y-auto rounded-t-2xl bg-surface pb-[max(1.5rem,env(safe-area-inset-bottom))]"
       >
         <div className="sticky top-0 z-10 grid grid-cols-[1fr_auto_1fr] items-center border-b border-separator bg-surface px-4 py-2">
           <button type="button" onClick={onClose} className="link justify-self-start">
@@ -132,7 +132,7 @@ export function Sheet({ title, action, canSave, onSave, onClose, children }: {
           <h2 className="text-body font-semibold">{title}</h2>
           <span />
         </div>
-        <div className="flex flex-col gap-6 px-4 pt-6 sm:px-6">
+        <div className="flex flex-col gap-6 px-4 pt-6">
           {children}
           <button className="btn" disabled={!canSave}>
             {action}
@@ -144,14 +144,14 @@ export function Sheet({ title, action, canSave, onSave, onClose, children }: {
 }
 
 /** Pick one option from cards with a label, helper text, and a "Recommended" tag. */
-export function OptionCards<T>({ options, value, onChange, columns = 1 }: {
+export function OptionCards<T>({ options, value, onChange }: {
   options: Option<T>[];
   value: T;
   onChange: (value: T) => void;
-  columns?: 1 | 2 | 3;
+  columns?: 1 | 2 | 3; // ignored: inside the phone frame, options always stack in one column
 }) {
   return (
-    <div role="radiogroup" className={`grid gap-2 ${{ 1: "", 2: "sm:grid-cols-2", 3: "sm:grid-cols-3" }[columns]}`}>
+    <div role="radiogroup" className="grid gap-2">
       {options.map((o) => {
         const on = o.value === value;
         return (

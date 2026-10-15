@@ -21,6 +21,7 @@
   --danger: #d70015;
   --success: #1f7a35;
   --success-wash: #e5f5ea;
+  --desk: #dcdce2; /* the page around the phone */
   /* The apartment illustration */
   --art-sky: #dce8f7;
   --art-cloud: #ffffff;
@@ -45,6 +46,7 @@
     --danger: #ff6961;
     --success: #30d158;
     --success-wash: #10301a;
+    --desk: #111113;
     --art-sky: #1b2740;
     --art-cloud: #3a4766;
     --art-left: #5c5048;
@@ -109,11 +111,10 @@
   --text-caption: 0.75rem; /* tab bar labels only */
   --text-caption--line-height: 1.3;
 
-  --animate-sheet: sheet 0.25s ease-out;
+  --animate-sheet: sheet 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
   @keyframes sheet {
     from {
-      transform: translateY(24px);
-      opacity: 0;
+      transform: translateY(100%);
     }
   }
 }
@@ -126,8 +127,13 @@
 }
 
 @layer base {
+  html,
   body {
-    @apply bg-bg font-sans text-body text-label antialiased;
+    @apply h-full;
+  }
+  body {
+    @apply font-sans text-body text-label antialiased;
+    background: var(--desk);
   }
   h1 {
     @apply text-large-title font-bold tracking-tight;
@@ -173,9 +179,66 @@
     @apply inline-flex min-h-11 items-center gap-2 font-semibold text-accent-ink;
   }
   .card {
-    @apply rounded-2xl bg-surface p-4 sm:p-6;
+    @apply rounded-2xl bg-surface p-4;
   }
   .field {
     @apply h-12 w-full rounded-xl border border-separator bg-surface px-4 text-label outline-none placeholder:text-secondary focus-within:border-accent-ink;
+  }
+}
+
+/*
+  The phone frame. Everything the app draws, including the tab bar and sheets, stays inside it:
+  the transform makes it the containing block for anything "fixed".
+*/
+.phone {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  transform: translateZ(0);
+}
+.screen {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* On anything bigger than a phone, show a 390 x 844 device centered on the page */
+@media (min-width: 500px) {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .phone {
+    width: 390px;
+    height: min(844px, calc(100dvh - 48px));
+    border: 10px solid #1c1c1e;
+    border-radius: 56px;
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.25);
+  }
+}
+@media (min-width: 500px) and (prefers-color-scheme: dark) {
+  .phone {
+    border-color: #3a3a3c; /* keeps the device edge visible on the dark page */
+  }
+}
+@media print {
+  body {
+    display: block;
+    overflow: visible;
+    background: white;
+  }
+  .phone,
+  .screen {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    transform: none;
   }
 }

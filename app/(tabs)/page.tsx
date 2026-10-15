@@ -10,7 +10,7 @@ import { AddBill, AddChore, AddEvent, ReportRepair } from "@/components/sheets";
 import { Dot, Logo } from "@/components/ui";
 import { DISHES, GUEST_NOTICE, PARTIES, clock, label, longDate } from "@/lib/agreement";
 import { allBills, debts, greeting, headsUp, isDone, money, rentStatus, time, upcoming, when } from "@/lib/house";
-import { reset, update, useHouse } from "@/lib/store";
+import { update, useHouse } from "@/lib/store";
 
 export default function Home() {
   const h = useHouse();
@@ -90,7 +90,7 @@ export default function Home() {
 
       {/* The apartment */}
       <section className="overflow-hidden rounded-2xl bg-surface">
-        <div className="relative h-44 bg-fill sm:h-64">
+        <div className="relative h-44 bg-fill">
           {h.photo ? (
             <Image src={h.photo} alt={`Photo of ${h.name}`} fill unoptimized className="object-cover" />
           ) : (
@@ -109,7 +109,7 @@ export default function Home() {
           </div>
           <input ref={photoInput} type="file" accept="image/*" className="hidden" aria-label="Choose an apartment photo" onChange={uploadPhoto} />
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4">
           <div className="min-w-0">
             <h2 className="text-title2 font-bold">{h.name}</h2>
             <p className="text-secondary">{household.address}</p>
@@ -117,16 +117,16 @@ export default function Home() {
               {h.mates.length} roommates · Lease {longDate(household.leaseStart)} to {longDate(household.leaseEnd)}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid w-full grid-cols-2 gap-2">
             {(["Bill", "Chore", "Event"] as const).map((kind) => (
-              <button key={kind} onClick={() => setAdding(kind)} className="btn-secondary w-auto px-4">
+              <button key={kind} onClick={() => setAdding(kind)} className="btn-secondary px-4">
                 <Icon name="plus" className="size-4" />
                 Add {kind}
               </button>
             ))}
-            <button onClick={() => setAdding("Repair")} className="btn-secondary w-auto px-4">
+            <button onClick={() => setAdding("Repair")} className="btn-secondary px-4">
               <Icon name="wrench" className="size-4" />
-              Report Repair
+              Add Repair
             </button>
           </div>
         </div>
@@ -152,7 +152,7 @@ export default function Home() {
       )}
 
       {/* At a glance */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4">
         <Stat
           label="Your rent share"
           value={money(rent.shares[h.me])}
@@ -173,8 +173,8 @@ export default function Home() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="flex flex-col gap-6 lg:col-span-2">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <RentCard h={h} />
 
           <Card title="Upcoming Chores" icon="chores" action={<SeeAll href="/chores" />}>
@@ -306,10 +306,6 @@ export default function Home() {
         <Logo />
         <p className="text-subhead text-secondary">No awkward conversations, just agree once.</p>
       </div>
-      <button onClick={reset} className="flex h-11 items-center gap-2 self-center px-4 text-subhead text-secondary md:hidden">
-        <Icon name="reset" className="size-4" />
-        Reset Demo
-      </button>
 
       {adding === "Bill" && <AddBill h={h} onClose={() => setAdding(null)} />}
       {adding === "Chore" && <AddChore h={h} onClose={() => setAdding(null)} />}

@@ -17,7 +17,7 @@ export default function Info() {
   return (
     <>
       <PageHeader title="Apartment Info" subtitle={`${h.agreement.household.address}. Tap any field to edit it; changes save automatically.`} />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="flex flex-col gap-6">
         {SECTIONS.map(({ title, icon, fields }) => (
           <Card key={title} title={title} icon={icon}>
             <div className="divide-y divide-separator">
