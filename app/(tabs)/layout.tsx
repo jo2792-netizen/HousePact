@@ -43,8 +43,8 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
 
       {/* Tablets and laptops: sidebar with the logo at the top */}
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col gap-6 border-r border-separator bg-surface p-4 md:flex print:hidden">
-        <div className="flex h-11 items-center px-2">
-          <Logo />
+        <div className="flex h-12 items-center px-2">
+          <Logo size="lg" />
         </div>
         {house && (
           <div className="px-2">
@@ -65,10 +65,11 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
             </Link>
           ))}
         </nav>
-        <button onClick={reset} className="mt-auto flex h-11 items-center gap-4 rounded-xl px-2 text-subhead text-secondary hover:bg-fill hover:text-label">
+        <button onClick={reset} className="mt-auto -mb-4 flex h-11 items-center gap-4 rounded-xl px-2 text-subhead text-secondary hover:bg-fill hover:text-label">
           <Icon name="reset" />
           Reset Demo
         </button>
+        <p className="px-2 text-subhead text-secondary">No awkward conversations, just agree once.</p>
       </aside>
 
       <div className="md:pl-64 print:pl-0">

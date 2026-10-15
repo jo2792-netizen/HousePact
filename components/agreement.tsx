@@ -26,7 +26,7 @@ export function AgreementDocument({ household, answers, signatures, onSign, onUn
       {/* Header */}
       <header className="flex flex-col items-center gap-4 border-b-2 border-label pb-6 text-center">
         <div className="font-sans">
-          <Logo />
+          <Logo size="lg" />
         </div>
         <h1 className="font-serif text-title2 font-semibold tracking-wide uppercase sm:text-title1">Residential Roommate Agreement</h1>
         <dl className="grid grid-cols-[auto_auto] gap-x-4 text-subhead">

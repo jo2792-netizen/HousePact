@@ -7,7 +7,7 @@ import { ApartmentArt } from "@/components/apartment-art";
 import { BillRow, Card, ChoreRow, EventRow, RentCard, SeeAll, Stat } from "@/components/cards";
 import { Icon, type IconName } from "@/components/icons";
 import { AddBill, AddChore, AddEvent, ReportRepair } from "@/components/sheets";
-import { Dot } from "@/components/ui";
+import { Dot, Logo } from "@/components/ui";
 import { DISHES, GUEST_NOTICE, PARTIES, clock, label, longDate } from "@/lib/agreement";
 import { allBills, debts, greeting, headsUp, isDone, money, rentStatus, time, upcoming, when } from "@/lib/house";
 import { reset, update, useHouse } from "@/lib/store";
@@ -26,7 +26,7 @@ export default function Home() {
   const iOwe = owed.filter((d) => d.from === h.me).reduce((sum, d) => sum + d.amount, 0);
   const owedToMe = owed.filter((d) => d.to === h.me).reduce((sum, d) => sum + d.amount, 0);
   const signed = signatures.filter(Boolean).length;
-  const unsigned = h.mates.filter((_, i) => !signatures[i]);
+  const unsigned = h.mates.filter((_, i) => i !== h.me && !signatures[i]); // invited roommates who haven't signed
   const events = upcoming(h.events);
   const quiet = headsUp(h.events);
   const openRepairs = (h.repairs ?? []).filter((r) => r.status !== "Fixed");
@@ -168,7 +168,7 @@ export default function Home() {
         <Stat
           label="Agreement"
           value={`${signed} of ${h.mates.length} signed`}
-          sub={unsigned.length ? `Invites out to ${unsigned.join(", ")}` : "Fully executed"}
+          sub={!signatures[h.me] ? "Your signature is needed" : unsigned.length ? `Invites out to ${unsigned.join(", ")}` : "Fully executed"}
           href="/pact"
         />
       </div>
@@ -302,6 +302,10 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="flex flex-col items-center gap-2 pt-4 text-center">
+        <Logo />
+        <p className="text-subhead text-secondary">No awkward conversations, just agree once.</p>
+      </div>
       <button onClick={reset} className="flex h-11 items-center gap-2 self-center px-4 text-subhead text-secondary md:hidden">
         <Icon name="reset" className="size-4" />
         Reset Demo

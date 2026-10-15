@@ -4,15 +4,26 @@ import type { ReactNode } from "react";
 import { Icon } from "@/components/icons";
 import type { Option } from "@/lib/agreement";
 
-/** The Housepact mark (a gold note with a check) and, optionally, the name. Small and quiet by design. */
-export function Logo({ name = true, size = "size-6" }: { name?: boolean; size?: string }) {
+const LOGO_SIZES = {
+  md: { mark: "size-8", text: "text-body", gap: "gap-2" }, // navigation bar
+  lg: { mark: "size-10", text: "text-title3", gap: "gap-2" }, // sidebar, agreement header
+  xl: { mark: "size-16", text: "text-title1", gap: "gap-4" }, // welcome screen
+};
+
+/** The Housepact mark (a gold note with a check) and the two-tone wordmark: "House" plus "pact" in the brand gold. */
+export function Logo({ name = true, size = "md" }: { name?: boolean; size?: keyof typeof LOGO_SIZES }) {
+  const s = LOGO_SIZES[size];
   return (
-    <span className="inline-flex items-center gap-2 text-subhead font-semibold text-label">
-      <svg viewBox="0 0 32 32" className={size} aria-hidden>
+    <span className={`inline-flex items-center ${s.gap} ${s.text} font-bold tracking-tight text-label`}>
+      <svg viewBox="0 0 32 32" className={`${s.mark} shrink-0`} aria-hidden>
         <rect width="32" height="32" rx="8" fill="#FFD95A" />
         <path d="M9 16.5l4.5 4.5L23 11.5" fill="none" stroke="#1C1C1E" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      {name && "Housepact"}
+      {name && (
+        <span>
+          House<span className="text-accent-ink">pact</span>
+        </span>
+      )}
     </span>
   );
 }
@@ -21,7 +32,7 @@ export function Logo({ name = true, size = "size-6" }: { name?: boolean; size?: 
 export function NavBar({ left, right }: { left?: ReactNode; right?: ReactNode }) {
   return (
     <header className="sticky top-0 z-20 border-b border-separator bg-bg/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl print:hidden">
-      <div className="mx-auto grid h-12 max-w-3xl grid-cols-[1fr_auto_1fr] items-center px-4">
+      <div className="mx-auto grid h-14 max-w-3xl grid-cols-[1fr_auto_1fr] items-center px-4">
         <div className="justify-self-start">{left}</div>
         <Logo />
         <div className="justify-self-end">{right}</div>

@@ -5,7 +5,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AgreementDocument } from "@/components/agreement";
 import { Icon } from "@/components/icons";
 import { QUESTIONS } from "@/components/questions";
-import { BackButton, Field, NavBar } from "@/components/ui";
+import { BackButton, Field, Logo, NavBar } from "@/components/ui";
 import { SAMPLE_NAMES, fitAnswers, joinNames, sampleEmail, longDate, sampleDraft, summary, type Answers, type Household } from "@/lib/agreement";
 import { newHouse } from "@/lib/house";
 import { canUndoReset, save, undoReset, useHouse } from "@/lib/store";
@@ -80,10 +80,11 @@ function Onboarding() {
   if (screen === WELCOME) {
     return (
       <Page>
-        <div className="flex flex-col gap-2 pt-4">
-          <h1>Your Roommate Agreement, Made Together</h1>
-          <p className="text-secondary">No awkward conversations, just agree once.</p>
+        <div className="flex flex-col gap-4 rounded-2xl bg-accent-wash p-6">
+          <Logo size="xl" />
+          <p className="text-title3 font-semibold text-label">No awkward conversations, just agree once.</p>
         </div>
+        <h1 className="text-title1">Your Roommate Agreement, Made Together</h1>
         <ol className="flex flex-col gap-4">
           {[
             ["Household Details", "The address, everyone's names, and the lease dates."],
